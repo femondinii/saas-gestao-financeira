@@ -1,0 +1,23 @@
+# =================
+# Python / Django
+# =================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtual env
+venv/
+.env
+
+# =================
+# Node / React
+# =================
+node_modules/
+frontend/build/
+
+# =================
+# Docker
+# =================
+.dockerignore

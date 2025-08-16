@@ -77,6 +77,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+if os.environ.get('GITHUB_ACTIONS') == 'true':
+    DB_HOST = 'localhost'
+else:
+    DB_HOST = 'db'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

@@ -1,0 +1,31 @@
+version: "2"
+checks:
+  argument-count:
+    enabled: true
+  method-complexity:
+    enabled: true
+  method-lines:
+    enabled: true
+  file-lines:
+    enabled: true
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - python
+        - javascript
+  eslint:
+    enabled: true
+  radon:
+    enabled: true
+ratings:
+  paths:
+    - "backend/**/*.py"
+    - "frontend/src/**/*.js"
+    - "frontend/src/**/*.jsx"
+exclude_patterns:
+  - "node_modules/"
+  - "frontend/build/"
+  - "backend/migrations/"
+  - "**/__pycache__/"

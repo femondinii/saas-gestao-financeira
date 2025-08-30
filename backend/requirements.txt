@@ -8,3 +8,5 @@ sqlparse==0.5.3
 tzdata==2025.2
 djangorestframework-simplejwt
 django-allauth
+bcrypt
+django-cors-headers==4.3

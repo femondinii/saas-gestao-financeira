@@ -1,12 +1,47 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.tokens import RefreshToken
 
-@api_view(["GET"])
-@permission_classes([IsAuthenticated])
-def profile(request):
-    return Response({
-        "message": f"Bem-vindo, {request.user.username}!",
-        "user_id": request.user.id,
-        "email": request.user.email,
-    })
+from .serializers import (
+    RegisterSerializer,
+    UserSerializer,
+    EmailTokenObtainPairSerializer,
+)
+
+class RegisterView(generics.CreateAPIView):
+    serializer_class = RegisterSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class LoginView(TokenObtainPairView):
+    serializer_class = EmailTokenObtainPairSerializer
+
+
+class RefreshView(TokenRefreshView):
+    permission_classes = [permissions.AllowAny]
+
+
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+
+    def post(self, request):
+        refresh = request.data.get("refresh")
+        if not refresh:
+            return Response({"detail": "Missing refresh token."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            token = RefreshToken(refresh)
+            token.blacklist()
+        except Exception:
+            return Response({"detail": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_205_RESET_CONTENT)
+
+
+class MeView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user

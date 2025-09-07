@@ -1,6 +1,6 @@
 function getApiBase() {
-  const base = "http://localhost:8000/api/accounts";
-  return base.replace(/\/$/, "");
+    const base = "http://localhost:8000/api/accounts";
+    return base.replace(/\/$/, "");
 }
 
 const API_BASE = getApiBase();
@@ -24,7 +24,6 @@ async function tryRefresh() {
         return true;
     } catch { return false; }
 }
-
 
 export async function apiFetch(path, { method='GET', body, headers={}, withAuth=true } = {}) {
     const h = { 'Accept': 'application/json', ...headers };
@@ -59,7 +58,6 @@ export async function apiFetch(path, { method='GET', body, headers={}, withAuth=
 
     return res;
 }
-
 
 export const api = {
     get: (p, o) => apiFetch(p, { ...o, method: 'GET' }),

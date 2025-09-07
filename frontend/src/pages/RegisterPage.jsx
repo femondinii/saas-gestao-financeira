@@ -53,7 +53,7 @@ export default function RegisterPage() {
 
     return (
         <AuthLayout
-            title="Azul Finance"
+            title="Blue Finance"
             subtitle="Crie uma conta para começar a gerenciar suas finanças"
         >
         <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
@@ -104,7 +104,7 @@ export default function RegisterPage() {
             </a>
         </p>
         <footer className="mt-10 text-center text-xs text-gray-400">
-            Azul Finance © 2025 – App de Gerenciamento Financeiro Pessoal
+            Blue Finance © 2025 – App de Gerenciamento Financeiro Pessoal
         </footer>
         <Toast toast={toast} onClose={hide} />
         </AuthLayout>

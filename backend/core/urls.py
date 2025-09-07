@@ -14,4 +14,7 @@ urlpatterns = [
 
     # rotas da app accounts
     path("api/accounts/", include("accounts.urls")),
+
+    # rotas da app finance
+    path("api/finance/", include("finance.urls")),
 ]

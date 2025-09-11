@@ -23,6 +23,7 @@ export default function LoginPage() {
 
 	useEffect(() => {
 		const m = sessionStorage.getItem("azul_logout_toast");
+
 		if (m) {
 			show({ title: "Logout realizado", message: m, tone: "success" });
 			sessionStorage.removeItem("azul_logout_toast");
@@ -38,7 +39,10 @@ export default function LoginPage() {
 
 		setLoading(true);
 		try {
-			const res = await api.post("/auth/login/", { email, password }, { withAuth: false });
+			const res = await api.post("/accounts/auth/login/", { email, password }, { withAuth: false });
+
+			console.log(res);
+			console.log({ email, password });
 
 			if (!res.ok) {
 				const data = await res.json().catch(() => null);
@@ -48,10 +52,9 @@ export default function LoginPage() {
 				throw new Error(Array.isArray(detail) ? detail.join(" ") : String(detail));
 			}
 
-			const data = await res.json(); // { access, refresh }
+			const data = await res.json();
 			if (!data?.access) throw new Error("Token de acesso não retornado pelo backend.");
 
-			// >>> Chaves padronizadas que o resto do app vai ler <<<
 			localStorage.setItem("access_token", data.access);
 			if (data.refresh) localStorage.setItem("refresh_token", data.refresh);
 
@@ -92,14 +95,6 @@ export default function LoginPage() {
 				<FormError message={error} />
 				<Button type="submit" disabled={loading}>
 					{loading ? "Entrando..." : "Entrar"}
-				</Button>
-				<Button
-						type="button"
-						variant="outline"
-						onClick={() => navigate("/transactions", { replace: true })}
-						className="w-auto px-4"
-				>
-						Testar navegação → /transactions
 				</Button>
 				<SocialOAuthRow
 					onGoogle={() =>

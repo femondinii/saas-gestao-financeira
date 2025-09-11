@@ -25,7 +25,7 @@ export default function RegisterPage() {
 
         try {
             const res = await api.post(
-                "/auth/register/",
+                "/accounts/auth/register/",
                 { name, email, password, password_confirm: password },
                 { withAuth: false }
             );

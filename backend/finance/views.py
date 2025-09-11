@@ -5,7 +5,6 @@ from .models import Category, Transaction
 from .serializers import CategorySerializer, TransactionSerializer
 
 class IsOwner(permissions.BasePermission):
-    """Garante que o objeto pertence ao usuário."""
     def has_object_permission(self, request, view, obj):
         return getattr(obj, "user_id", None) == request.user.id
 
@@ -20,7 +19,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
     pagination_class = DefaultPagination
 
     def get_queryset(self):
-        return Category.objects.filter(user=self.request.user).order_by("name")
+        u = self.request.user
+        return Category.objects.filter(Q(user=u) | Q(user__isnull=True)).order_by("name")
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -73,7 +73,6 @@ class TransactionViewSet(viewsets.ModelViewSet):
             qs = qs.filter(Q(description__icontains=q) | Q(notes__icontains=q))
 
         # ---- Ordenação ----
-        # permitidos: date, -date, amount, -amount, created_at, -created_at
         ordering = params.get("ordering", "-date")
         allowed = {"date", "-date", "amount", "-amount", "created_at", "-created_at"}
         if ordering not in allowed:

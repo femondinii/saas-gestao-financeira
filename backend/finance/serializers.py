@@ -1,16 +1,28 @@
 from rest_framework import serializers
 from .models import Category, Transaction
+from django.db.models import Q
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ["id", "name", "kind", "is_system"]
+        fields = ["id", "name", "is_system"]
         read_only_fields = ["id", "is_system"]
+
+    def validate_name(self, value):
+        user = self.context["request"].user
+        qs = Category.objects.filter(
+            Q(user=user) | Q(user__isnull=True),
+            name__iexact=value.strip(),
+        )
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Já existe uma categoria com esse nome.")
+        return value
 
     def create(self, validated_data):
         validated_data["user"] = self.context["request"].user
         return super().create(validated_data)
-
 
 class TransactionSerializer(serializers.ModelSerializer):
     category_detail = CategorySerializer(source="category", read_only=True)
@@ -29,13 +41,6 @@ class TransactionSerializer(serializers.ModelSerializer):
 
         if amount is not None and amount <= 0:
             raise serializers.ValidationError({"amount": "O valor deve ser positivo."})
-
-        category = attrs.get("category") or getattr(self.instance, "category", None)
-        tx_type = attrs.get("type") or getattr(self.instance, "type", None)
-
-        if category and tx_type and category.kind != Category.Kind.BOTH and category.kind != tx_type:
-            raise serializers.ValidationError({"category": "Categoria incompatível com o tipo da transação."})
-
         return attrs
 
     def create(self, validated_data):

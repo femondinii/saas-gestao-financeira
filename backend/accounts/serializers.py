@@ -15,26 +15,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
-    validators=[UniqueValidator(queryset=User.objects.all(), message="Email já está em uso.")]
+        validators=[UniqueValidator(queryset=User.objects.all(), message="Email já está em uso.")]
     )
     password = serializers.CharField(write_only=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True, min_length=8)
 
-
     class Meta:
         model = User
         fields = ("email", "name", "password", "password_confirm")
-
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password_confirm"]:
             raise serializers.ValidationError({"password_confirm": "Senhas não conferem."})
         return attrs
 
-
     def create(self, validated_data):
         validated_data.pop("password_confirm")
         password = validated_data.pop("password")
+
         try:
             user = User.objects.create_user(password=password, **validated_data)
         except IntegrityError:
@@ -42,7 +40,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
-    # Login por email
     username_field = "email"
 
     @classmethod

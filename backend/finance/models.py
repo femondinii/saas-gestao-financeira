@@ -1,28 +1,43 @@
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Q
+from django.db.models.functions import Lower
 from django.utils import timezone
 from decimal import Decimal
 
 User = settings.AUTH_USER_MODEL
 
 class Category(models.Model):
-    class Kind(models.TextChoices):
-        EXPENSE = "expense", "Despesa"
-        INCOME  = "income",  "Receita"
-        BOTH    = "both",    "Ambas"
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="categories")
+    user = models.ForeignKey(
+        User, null=True, blank=True,
+        on_delete=models.CASCADE, related_name="categories"
+    )
     name = models.CharField(max_length=60)
-    kind = models.CharField(max_length=10, choices=Kind.choices, default=Kind.BOTH)
     is_system = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ("user", "name")
-        indexes = [models.Index(fields=["user","name"]), models.Index(fields=["user","kind"])]
+        constraints = [
+            models.UniqueConstraint(
+                Lower("name"), "user",
+                name="uniq_user_category_name_insensitive",
+            ),
+            models.UniqueConstraint(
+                Lower("name"),
+                condition=Q(user__isnull=True),
+                name="uniq_global_category_name_insensitive",
+            ),
+        ]
+        indexes = [
+            models.Index(Lower("name"), name="idx_category_name_lower"),
+            models.Index(fields=["user", "name"]),
+        ]
         ordering = ["name"]
 
-    def __str__(self): return f"{self.name} ({self.user})"
+    def __str__(self):
+        who = "global" if self.user_id is None else self.user
+        return f"{self.name} ({who})"
+
 
 class Transaction(models.Model):
     class Type(models.TextChoices):

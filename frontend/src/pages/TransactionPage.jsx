@@ -105,9 +105,9 @@ export default function TransactionsPage() {
                 <SelectValue placeholder="Tipo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="todos">Todos</SelectItem>
-                <SelectItem value="receita">Receitas</SelectItem>
-                <SelectItem value="despesa">Despesas</SelectItem>
+                <SelectItem value="Todos">Todos</SelectItem>
+                <SelectItem value="Receita">Receitas</SelectItem>
+                <SelectItem value="Despesa">Despesas</SelectItem>
               </SelectContent>
             </Select>
 

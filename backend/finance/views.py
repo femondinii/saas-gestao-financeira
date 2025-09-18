@@ -1,6 +1,8 @@
 from django.db.models import Q
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from .models import Category, Transaction
 from .serializers import CategorySerializer, TransactionSerializer
 
@@ -83,3 +85,20 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    @action(detail=False, methods=["delete"], url_path="bulk")
+    def bulk_delete(self, request):
+        raw = request.query_params.getlist("id")
+
+        if not raw and isinstance(request.data, dict):
+            raw = request.data.get("ids", [])
+        try:
+            ids = [int(x) for x in raw]
+        except (TypeError, ValueError):
+            return Response({"detail": "ids inválidos"}, status=status.HTTP_400_BAD_REQUEST)
+        if not ids:
+            return Response({"detail": "informe id"}, status=status.HTTP_400_BAD_REQUEST)
+        qs = Transaction.objects.filter(user=request.user, id__in=ids)
+        deleted = qs.count()
+        qs.delete()
+        return Response({"deleted": deleted}, status=status.HTTP_200_OK)

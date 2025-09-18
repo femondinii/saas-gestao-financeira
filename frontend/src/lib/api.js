@@ -78,9 +78,9 @@ export async function apiFetch(
 }
 
 export const api = {
-  get: (p, o) => apiFetch(p, { ...o, method: "GET" }),
-  post: (p, b, o) => apiFetch(p, { ...o, method: "POST", body: b }),
-  put: (p, b, o) => apiFetch(p, { ...o, method: "PUT", body: b }),
-  patch: (p, b, o) => apiFetch(p, { ...o, method: "PATCH", body: b }),
-  del: (p, o) => apiFetch(p, { ...o, method: "DELETE" }),
+    get: (p, o) => apiFetch(p, { ...o, method: "GET" }),
+    post: (p, b, o) => apiFetch(p, { ...o, method: "POST", body: b }),
+    put: (p, b, o) => apiFetch(p, { ...o, method: "PUT", body: b }),
+    patch: (p, b, o) => apiFetch(p, { ...o, method: "PATCH", body: b }),
+    del: (p, o) => apiFetch(p, { ...o, method: "DELETE" }),
 };

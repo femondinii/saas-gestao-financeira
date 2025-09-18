@@ -1,38 +1,22 @@
 import React, {
-  useState,
-  useRef,
-  useEffect,
-  createContext,
-  useContext,
-  useMemo,
+  useState, useRef, useEffect, useContext, useMemo, createContext,
 } from "react";
 import { ChevronDown, Check } from "lucide-react";
 
-const SelectContext = createContext();
+const SelectContext = createContext(null);
 
-const extractOptions = (children) => {
-  const map = {};
+const collectItemLabels = (children, map = {}) => {
   React.Children.forEach(children, (child) => {
     if (!React.isValidElement(child)) return;
-
-    const isSelectItem =
-      child.type?.displayName === "SelectItem" || child.type?.__selectItem === true;
-
-    if (isSelectItem) {
-      const val = child.props.value;
-      const labelFromProp = child.props.label;
-      const labelFromChildren =
-        typeof child.props.children === "string"
-          ? child.props.children
-          : String(child.props.children ?? "");
-      const label = labelFromProp != null ? String(labelFromProp) : labelFromChildren;
-
-      if (val != null) map[val] = label;
+    const t = child.type;
+    if (t && t.displayName === "SelectItem") {
+      const v = child.props.value;
+      const label = typeof child.props.children === "string"
+        ? child.props.children
+        : String(child.props.children);
+      if (v != null) map[String(v)] = label;
     }
-
-    if (child.props && child.props.children) {
-      Object.assign(map, extractOptions(child.props.children));
-    }
+    if (child.props?.children) collectItemLabels(child.props.children, map);
   });
   return map;
 }
@@ -42,8 +26,8 @@ export const Select = ({ value, onValueChange, children, className = "" }) => {
   const triggerRef = useRef(null);
   const contentRef = useRef(null);
 
-  const labelsMap = useMemo(() => extractOptions(children), [children]);
-  const getLabelFor = (val) => (val in labelsMap ? labelsMap[val] : val ?? "");
+  const labelsMap = useMemo(() => collectItemLabels(children), [children]);
+  const getLabelFor = (v) => (v != null ? (labelsMap[String(v)] ?? String(v)) : "");
 
   useEffect(() => {
     const onClickOutside = (e) => {
@@ -53,37 +37,14 @@ export const Select = ({ value, onValueChange, children, className = "" }) => {
         !triggerRef.current.contains(e.target) &&
         contentRef.current &&
         !contentRef.current.contains(e.target)
-      ) {
-        setOpen(false);
-      }
-    }
-
-    const onKey = (e) => {
-      if (!open) return;
-      if (e.key === "Escape") setOpen(false);
-    }
-
-    document.addEventListener("mousedown", onClickOutside);
-    document.addEventListener("keydown", onKey);
-
-    return () => {
-      document.removeEventListener("mousedown", onClickOutside);
-      document.removeEventListener("keydown", onKey);
+      ) setOpen(false);
     };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
   }, [open]);
 
   return (
-    <SelectContext.Provider
-      value={{
-        value,
-        onValueChange,
-        open,
-        setOpen,
-        triggerRef,
-        contentRef,
-        getLabelFor,
-      }}
-    >
+    <SelectContext.Provider value={{ value, onValueChange, open, setOpen, triggerRef, contentRef, getLabelFor }}>
       <div className={`relative inline-block w-full ${className}`}>{children}</div>
     </SelectContext.Provider>
   );
@@ -105,14 +66,10 @@ export const SelectTrigger = ({ placeholder = "Selecione...", className = "", ch
       onClick={() => setOpen(!open)}
       className={`flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 text-sm focus:ring-2 focus:ring-blue-500 ${className}`}
     >
-      {children ?? (
-        <span className={`truncate ${value ? "text-gray-900" : "text-gray-400"}`}>
-          {value ? getLabelFor(value) : placeholder}
-        </span>
-      )}
-      <ChevronDown
-        className={`h-4 w-4 opacity-70 transition-transform ${open ? "rotate-180" : ""}`}
-      />
+      <span className={`truncate ${value ? "text-gray-900" : "text-gray-400"}`}>
+        {children ?? (value ? getLabelFor(value) : placeholder)}
+      </span>
+      <ChevronDown className={`h-4 w-4 opacity-70 transition-transform ${open ? "rotate-180" : ""}`} />
     </button>
   );
 }
@@ -120,9 +77,7 @@ export const SelectTrigger = ({ placeholder = "Selecione...", className = "", ch
 export const SelectContent = ({ children, className = "" }) => {
   const { open, contentRef, triggerRef } = useSelect();
   if (!open) return null;
-
   const width = triggerRef.current?.offsetWidth || "auto";
-
   return (
     <div
       ref={contentRef}
@@ -135,14 +90,12 @@ export const SelectContent = ({ children, className = "" }) => {
   );
 }
 
-export function SelectItem({ value, children, className = "" }) {
+export const SelectItem = ({ value, children, className = "" }) => {
   const { onValueChange, setOpen, value: current } = useSelect();
-  const selected = current === value;
+  const selected = String(current) === String(value);
 
   return (
     <div
-      role="option"
-      aria-selected={selected}
       onClick={() => {
         onValueChange?.(value);
         setOpen(false);
@@ -156,6 +109,7 @@ export function SelectItem({ value, children, className = "" }) {
     </div>
   );
 }
+SelectItem.displayName = "SelectItem";
 
 export function SelectLabel({ children, className = "" }) {
   return <div className={`py-1.5 pl-8 pr-2 text-sm font-semibold ${className}`}>{children}</div>;
@@ -167,10 +121,5 @@ export function SelectSeparator({ className = "" }) {
 
 export function SelectValue({ placeholder = "Selecione..." }) {
   const { value, getLabelFor } = useSelect();
-
-  if (!value) {
-    return <span className="text-gray-400">{placeholder}</span>;
-  }
-
-  return <>{getLabelFor(value)}</>;
+  return value ? <>{getLabelFor(value)}</> : <span className="text-gray-400">{placeholder}</span>;
 }

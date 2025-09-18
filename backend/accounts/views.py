@@ -26,7 +26,6 @@ class RefreshView(TokenRefreshView):
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-
     def post(self, request):
         refresh = request.data.get("refresh")
         if not refresh:

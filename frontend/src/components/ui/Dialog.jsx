@@ -12,13 +12,13 @@ import { X } from "lucide-react";
 
 const DialogCtx = createContext(null);
 
-export function Dialog({
+export const Dialog = ({
   open: openProp,
   onOpenChange,
   defaultOpen = false,
   children,
   className = "",
-}) {
+}) => {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const isControlled = typeof openProp === "boolean";
   const open = isControlled ? openProp : uncontrolledOpen;
@@ -34,12 +34,12 @@ export function Dialog({
   const titleId = useId();
   const descId = useId();
 
-  // Fecha com ESC (listener único aqui; não depende do conteúdo)
   useEffect(() => {
-    function onKey(e) {
+    const onKey = (e) => {
       if (!open) return;
       if (e.key === "Escape") setOpen(false);
-    }
+    };
+
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [open, setOpen]);
@@ -56,14 +56,13 @@ export function Dialog({
   );
 }
 
-function useDialog() {
+const useDialog = () => {
   const ctx = useContext(DialogCtx);
   if (!ctx) throw new Error("Dialog.* deve ser usado dentro de <Dialog>");
   return ctx;
 }
 
-/* ============== Trigger ============== */
-export function DialogTrigger({ asChild, children, className = "", ...props }) {
+export const DialogTrigger = ({ asChild, children, className = "", ...props }) => {
   const { setOpen } = useDialog();
   const handleClick = () => setOpen(true);
 
@@ -88,16 +87,15 @@ export function DialogTrigger({ asChild, children, className = "", ...props }) {
   );
 }
 
-/* ============== Overlay ============== */
-export function DialogOverlay({ className = "", onClick, ...props }) {
+export const DialogOverlay = ({ className = "", onClick, ...props }) => {
   const { open, setOpen } = useDialog();
+
   if (!open) return null;
 
   const node = (
     <div
       onClick={(e) => {
         onClick?.(e);
-        // fecha ao clicar no overlay (mas não dentro do conteúdo)
         setOpen(false);
       }}
       className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm ${className}`}
@@ -107,9 +105,8 @@ export function DialogOverlay({ className = "", onClick, ...props }) {
   return createPortal(node, document.body);
 }
 
-/* ============== Content ============== */
-export function DialogContent({ children, className = "", ...props }) {
-  const { open, setOpen, titleId, descId } = useDialog();
+export const DialogContent = ({ children, className = "", ...props }) => {
+  const { open, titleId, descId } = useDialog();
   if (!open) return null;
 
   const node = (
@@ -118,7 +115,6 @@ export function DialogContent({ children, className = "", ...props }) {
       aria-modal="true"
       aria-labelledby={titleId}
       aria-describedby={descId}
-      // container “click-through”: impede o overlay de fechar quando clicar dentro
       onClick={(e) => e.stopPropagation()}
       className={`fixed left-1/2 top-1/2 z-[60] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border border-gray-200 bg-white p-6 shadow-lg ${className}`}
       {...props}
@@ -137,8 +133,7 @@ export function DialogContent({ children, className = "", ...props }) {
   );
 }
 
-/* ============== Close ============== */
-export function DialogClose({ asChild, children, className = "", ...props }) {
+export const DialogClose = ({ asChild, children, className = "", ...props }) => {
   const { setOpen } = useDialog();
   const onClick = () => setOpen(false);
 
@@ -164,18 +159,19 @@ export function DialogClose({ asChild, children, className = "", ...props }) {
   );
 }
 
-/* ============== Extras ============== */
-export function DialogHeader({ children, className = "" }) {
+export const DialogHeader = ({ children, className = "" }) => {
   return <div className={`mb-3 flex flex-col space-y-1.5 text-left ${className}`}>{children}</div>;
 }
-export function DialogFooter({ children, className = "" }) {
+
+export const DialogFooter = ({ children, className = "" }) => {
   return (
     <div className={`mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end ${className}`}>
       {children}
     </div>
   );
 }
-export function DialogTitle({ children, className = "" }) {
+
+export const DialogTitle = ({ children, className = "" }) => {
   const { titleId } = useDialog();
   return (
     <h3 id={titleId} className={`text-lg font-semibold leading-none tracking-tight ${className}`}>
@@ -183,7 +179,8 @@ export function DialogTitle({ children, className = "" }) {
     </h3>
   );
 }
-export function DialogDescription({ children, className = "" }) {
+
+export const DialogDescription = ({ children, className = "" }) => {
   const { descId } = useDialog();
   return (
     <p id={descId} className={`text-sm text-gray-500 ${className}`}>

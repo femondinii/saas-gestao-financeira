@@ -13,10 +13,9 @@ import { api } from "../../lib/api";
 export function CategorySelect({
   value,
   onChange,
-  label = "Categoria",
-  placeholder = "Selecione a categoria",
-  withCreate = true,
+  withCreate = false,
   className = "",
+  placeholder = "Selecione a categoria",
 }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -29,13 +28,13 @@ export function CategorySelect({
       const data = await res.json().catch(() => ({}));
       const list = Array.isArray(data) ? data : (data.results ?? []);
       const mapped = list
-        .map(c => ({ id: String(c.id), name: c.name, is_system: !!c.is_system }))
+        .map((c) => ({ id: String(c.id), name: c.name, is_system: !!c.is_system }))
         .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
       setItems(mapped);
 
       if (selectByName) {
         const found = mapped.find(
-          c => c.name.toLowerCase() === String(selectByName).toLowerCase()
+          (c) => c.name.toLowerCase() === String(selectByName).toLowerCase()
         );
         if (found && onChange) onChange(found.id);
       }
@@ -51,9 +50,13 @@ export function CategorySelect({
 
   function handleCreated(payload) {
     if (payload && typeof payload === "object" && payload.id) {
-      const created = { id: String(payload.id), name: payload.name, is_system: !!payload.is_system };
-      setItems(prev => {
-        const exists = prev.some(p => p.id === created.id);
+      const created = {
+        id: String(payload.id),
+        name: payload.name,
+        is_system: !!payload.is_system,
+      };
+      setItems((prev) => {
+        const exists = prev.some((p) => p.id === created.id);
         const next = exists ? prev : [...prev, created];
         return next.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
       });
@@ -69,12 +72,12 @@ export function CategorySelect({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      <div className="flex items-center">
-        <Label>{label}</Label>
-        {withCreate && (
+      {withCreate ? (
+        <div className="flex items-center">
+          <Label>Categoria</Label>
           <CategoryCreateButton onCreated={handleCreated} className="ml-auto" />
-        )}
-      </div>
+        </div>
+      ) : null}
 
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="h-10 w-full">
@@ -82,12 +85,14 @@ export function CategorySelect({
         </SelectTrigger>
         <SelectContent>
           {items.map((cat) => (
-            <SelectItem key={cat.id} value={cat.name}>
+            <SelectItem key={cat.id} value={cat.id}>
               {cat.name}
             </SelectItem>
           ))}
           {items.length === 0 && (
-            <SelectItem value="__none" disabled>Nenhuma categoria</SelectItem>
+            <SelectItem value="__none" disabled>
+              Nenhuma categoria
+            </SelectItem>
           )}
         </SelectContent>
       </Select>

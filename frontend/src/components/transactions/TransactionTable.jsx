@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Badge } from "../ui/Badge";
 import { formatDateFlexible } from "../../utils/date";
 import { InputCheckbox } from "../ui/Input";
+import { formatBRL } from "../../utils/formatters";
 
 export const TransactionTable = ({
   items = [],
@@ -15,17 +16,17 @@ export const TransactionTable = ({
 
     if (loading) {
         return (
-        <div className="bg-white border border-gray-200 rounded-xl p-10 text-center text-gray-500">
-            Carregando...
-        </div>
+            <div className="bg-white border border-gray-200 rounded-xl p-10 text-center text-gray-500">
+                Carregando...
+            </div>
         );
     }
 
     if (!items.length) {
         return (
-        <div className="bg-white border border-gray-200 rounded-xl p-10 text-center text-gray-500">
-            Nenhuma transação encontrada.
-        </div>
+            <div className="bg-white border border-gray-200 rounded-xl p-10 text-center text-gray-500">
+                Nenhuma transação encontrada.
+            </div>
         );
     }
 
@@ -61,19 +62,19 @@ export const TransactionTable = ({
                                     onChange={(e) => onToggleRow?.(t.id, e.target.checked)}
                                 />
                             </Td>
-                            <Td>{t.description || "Sem descrição"}</Td>
+                            <Td>{t.description}</Td>
                             <Td>
                                 {t.category ? (
                                     <Badge tone="neutral">{t.category}</Badge>
                                 ) : (
-                                    <span className="text-gray-400">Sem categoria</span>
+                                    <Badge tone="default">Não preenchido</Badge>
                                 )}
                             </Td>
                             <Td>{formatDateFlexible(t.date)}</Td>
                             <Td className="text-right pr-6 font-semibold">
                                 <span className={t.type === "income" ? "text-green-600" : "text-red-600"}>
                                     {t.type === "income" ? "+ " : "- "}
-                                    {formatBRL(Math.abs(t.amount))}
+                                    {formatBRL(t.amount)}
                                 </span>
                             </Td>
                         </tr>
@@ -90,8 +91,5 @@ const Th = ({ children, className = "" }) => (
 );
 
 const Td = ({ children, className = "" }) => (
-    <td className={`px-6 py-3 ${className}`}>{children}</td>
+    <td className={`px-6 py-3 ${className} ${children ? "" : "text-gray-400"}`}>{children || "Não preenchido"}</td>
 );
-
-const formatBRL = (v) =>
-    Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });

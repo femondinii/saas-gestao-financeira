@@ -19,7 +19,7 @@ export default function LoginPage() {
 
 	const navigate = useNavigate();
 	const location = useLocation();
-	const redirectTo = location.state?.from?.pathname || "/transactions";
+	const redirectTo = location.state?.from?.pathname || "/";
 
 	useEffect(() => {
 		const m = sessionStorage.getItem("azul_logout_toast");

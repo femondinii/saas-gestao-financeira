@@ -3,7 +3,6 @@ import { NavLink, Link } from "react-router-dom";
 import {
     BarChart3,
     CreditCard,
-    Goal,
     Home,
     Menu,
     Settings,
@@ -17,9 +16,8 @@ export function Sidebar({ className = "" }) {
     const navigationItems = [
         { name: "Dashboard", icon: Home, path: "/" },
         { name: "Transações", icon: CreditCard, path: "/transactions" },
-        { name: "Metas", icon: Goal, path: "/goals" },
+        // { name: "Metas", icon: Goal, path: "/goals" },
         { name: "Planejamento IA", icon: Sparkles, path: "/ai-planning" },
-        { name: "Relatórios", icon: BarChart3, path: "/reports" },
     ];
 
     const base = "flex h-screen flex-col border-r bg-white dark:bg-neutral-950 text-gray-800 dark:text-gray-100 transition-all duration-300";

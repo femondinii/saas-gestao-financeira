@@ -80,6 +80,7 @@ export default function TransactionsPage() {
         q.set("ordering", "-date");
 
         const res = await api.get(`/finance/transactions/?${q.toString()}`);
+
         if (!res.ok) {
           setRows([]);
           return;
@@ -88,16 +89,16 @@ export default function TransactionsPage() {
         const list = Array.isArray(data) ? data : (data.results ?? []);
 
         const mapped = list.map((t) => {
-          const signed = t.type === "income" ? Number(t.amount) : -Number(t.amount);
           return {
             id: t.id,
-            description: t.description || "",
-            category: t.category_detail?.name || "—",
+            description: t.description,
+            category: t.category_detail?.name,
             date: formatDateFlexible(t.date),
-            amount: signed,
+            amount: Number(t.amount),
             type: t.type,
           };
         });
+
         setRows(mapped);
       } finally {
         setLoading(false);
@@ -153,13 +154,16 @@ export default function TransactionsPage() {
   function openDeleteDialog() {
     if (selectedIds.size > 0) setDeleteOpen(true);
   }
+
   function closeDeleteDialog() {
     setDeleteOpen(false);
   }
 
   async function confirmDelete() {
     const ids = Array.from(selectedIds);
+
     if (ids.length === 0) return;
+
     try {
       if (ids.length === 1) {
         const r = await api.del(`/finance/transactions/${ids[0]}/`);
@@ -292,7 +296,7 @@ export default function TransactionsPage() {
                 variant="primary"
                 className="inline-flex items-center gap-2 p-3"
                 aria-haspopup="menu"
-                disabled={openActions}
+                disabled={selectedCount === 0 && !openActions}
                 onClick={() => setOpenActions((v) => !v)}
               >
                 Ações <ChevronDown className="h-4 w-4" />
@@ -313,10 +317,7 @@ export default function TransactionsPage() {
                   </button>
 
                   <button
-                    className={`flex w-full items-center gap-2 rounded px-3 py-2 text-left hover:bg-gray-50 text-rose-600 ${
-                      selectedCount === 0 ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                    disabled={selectedCount === 0}
+                    className={"flex w-full items-center gap-2 rounded px-3 py-2 text-left hover:bg-gray-50 text-rose-600"}
                     onClick={() => {
                       setOpenActions(false);
                       openDeleteDialog();

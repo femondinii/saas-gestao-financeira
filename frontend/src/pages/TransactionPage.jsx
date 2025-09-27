@@ -21,21 +21,23 @@ import { NewTransactionModal } from "../components/transactions/NewTransactionMo
 import { CategorySelect } from "../components/categories/CategorySelect";
 import { AlertModal } from "../components/ui/AlertModal";
 import { api } from "../lib/api";
-import {
-  formatDateFlexible,
-  firstDayOfMonthISO,
-  lastDayOfMonthISO,
-} from "../utils/date";
 import { EditTransactionModal } from "../components/transactions/EditTransactionModal";
+import { formatDateFlexible } from "../utils/date";
+import PeriodSelect from "../components/filters/PeriodSelect";
 
 export default function TransactionsPage() {
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [type, setType] = useState("");
-  const [dateStart, setDateStart] = useState(() => firstDayOfMonthISO(new Date()));
-  const [dateEnd, setDateEnd] = useState(() => lastDayOfMonthISO(new Date()));
+  const [dateStart, setDateStart] = useState("");
+  const [dateEnd, setDateEnd] = useState("");
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 20;
 
   const [editOpen, setEditOpen] = useState(false);
   const [editTx, setEditTx] = useState(null);
@@ -44,8 +46,9 @@ export default function TransactionsPage() {
     search: "",
     categoryId: "",
     type: "",
-    dateStart,
-    dateEnd,
+    dateStart: "",
+    dateEnd: "",
+    page: 1,
   }));
 
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -78,26 +81,39 @@ export default function TransactionsPage() {
         if (params.dateStart) q.set("date_start", params.dateStart);
         if (params.dateEnd) q.set("date_end", params.dateEnd);
         q.set("ordering", "-date");
+        q.set("page", params.page || 1);
+        q.set("page_size", pageSize);
 
         const res = await api.get(`/finance/transactions/?${q.toString()}`);
 
         if (!res.ok) {
           setRows([]);
+          setTotalCount(0);
+          setTotalPages(1);
           return;
         }
+
         const data = await res.json().catch(() => ({}));
         const list = Array.isArray(data) ? data : (data.results ?? []);
 
-        const mapped = list.map((t) => {
-          return {
-            id: t.id,
-            description: t.description,
-            category: t.category_detail?.name,
-            date: formatDateFlexible(t.date),
-            amount: Number(t.amount),
-            type: t.type,
-          };
-        });
+        if (data.count !== undefined) {
+          setTotalCount(data.count);
+          setTotalPages(Math.ceil(data.count / pageSize));
+        } else {
+          setTotalCount(list.length);
+          setTotalPages(1);
+        }
+
+        setCurrentPage(params.page || 1);
+
+        const mapped = list.map((t) => ({
+          id: t.id,
+          description: t.description,
+          category: t.category_detail?.name,
+          date: formatDateFlexible(t.date),
+          amount: Number(t.amount),
+          type: t.type,
+        }));
 
         setRows(mapped);
       } finally {
@@ -109,6 +125,7 @@ export default function TransactionsPage() {
 
   useEffect(() => {
     fetchTransactions(queryParams);
+    resetSelection();
   }, [fetchTransactions, queryParams]);
 
   function handleSearch() {
@@ -118,33 +135,30 @@ export default function TransactionsPage() {
       type,
       dateStart,
       dateEnd,
+      page: 1,
     });
   }
 
   function clearFilters() {
-    const ds = firstDayOfMonthISO(new Date());
-    const de = lastDayOfMonthISO(new Date());
     setSearch("");
     setCategoryId("");
     setType("");
-    setDateStart(ds);
-    setDateEnd(de);
+    setDateStart("");
+    setDateEnd("");
     setQueryParams({
       search: "",
       categoryId: "",
       type: "",
-      dateStart: ds,
-      dateEnd: de,
+      dateStart: "",
+      dateEnd: "",
+      page: 1,
     });
   }
 
-  function onStartChange(v) {
-    if (dateEnd && v > dateEnd) setDateEnd(v);
-    setDateStart(v);
-  }
-  function onEndChange(v) {
-    if (dateStart && v < dateStart) setDateStart(v);
-    setDateEnd(v);
+  function goToPage(page) {
+    if (page >= 1 && page <= totalPages) {
+      setQueryParams((prev) => ({ ...prev, page }));
+    }
   }
 
   function handleCreated() {
@@ -161,7 +175,6 @@ export default function TransactionsPage() {
 
   async function confirmDelete() {
     const ids = Array.from(selectedIds);
-
     if (ids.length === 0) return;
 
     try {
@@ -186,9 +199,11 @@ export default function TransactionsPage() {
   async function handleEditSelected() {
     const ids = Array.from(selectedIds);
     if (ids.length !== 1) return;
+
     const id = ids[0];
     const res = await api.get(`/finance/transactions/${id}/`);
     if (!res.ok) return;
+
     const t = await res.json();
     setEditTx(t);
     setEditOpen(true);
@@ -205,7 +220,6 @@ export default function TransactionsPage() {
         </div>
         <NewTransactionModal onTransactionCreated={handleCreated} />
       </div>
-
       <Card>
         <CardHeader className="pb-3">
           <CardTitle>Filtros</CardTitle>
@@ -223,13 +237,11 @@ export default function TransactionsPage() {
                 }
               />
             </div>
-
             <CategorySelect
               value={categoryId}
               onChange={setCategoryId}
               placeholder="Categoria"
             />
-
             <Select value={type} onValueChange={setType}>
               <SelectTrigger className="h-10 w-full">
                 <SelectValue placeholder="Tipo" />
@@ -240,29 +252,14 @@ export default function TransactionsPage() {
                 <SelectItem value="expense">Despesas</SelectItem>
               </SelectContent>
             </Select>
-
-            <div className="relative">
-              <input
-                type="date"
-                value={dateStart}
-                max={dateEnd || undefined}
-                onChange={(e) => onStartChange(e.target.value)}
-                className="h-10 w-full rounded-md border border-gray-300 bg-white pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label="Data inicial"
-              />
-            </div>
-
-            <div className="relative">
-              <input
-                type="date"
-                value={dateEnd}
-                min={dateStart || undefined}
-                onChange={(e) => onEndChange(e.target.value)}
-                className="h-10 w-full rounded-md border border-gray-300 bg-white pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label="Data final"
-              />
-            </div>
-
+            <PeriodSelect
+              dateStart={dateStart}
+              dateEnd={dateEnd}
+              onChange={(ds, de) => {
+                setDateStart(ds || "");
+                setDateEnd(de || "");
+              }}
+            />
             <div className="flex gap-2">
               <Button
                 onClick={handleSearch}
@@ -280,13 +277,8 @@ export default function TransactionsPage() {
               </Button>
             </div>
           </div>
-
-          <p className="pl-9 mt-3 text-xs text-gray-500">
-            Período aplicado: {formatDateFlexible(queryParams.dateStart)} — {formatDateFlexible(queryParams.dateEnd)}
-          </p>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -330,7 +322,6 @@ export default function TransactionsPage() {
             </div>
           </div>
         </CardHeader>
-
         <CardContent>
           <TransactionTable
             items={rows}
@@ -338,10 +329,13 @@ export default function TransactionsPage() {
             selectedIds={selectedIds}
             onToggleRow={onToggleRow}
             onToggleAll={onToggleAll}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalCount={totalCount}
+            onPageChange={goToPage}
           />
         </CardContent>
       </Card>
-
       <AlertModal
         open={deleteOpen}
         title="Excluir"
@@ -354,7 +348,6 @@ export default function TransactionsPage() {
         onConfirm={confirmDelete}
         onCancel={closeDeleteDialog}
       />
-
       <EditTransactionModal
         open={editOpen}
         onOpenChange={(o) => {

@@ -3,13 +3,18 @@ import { Badge } from "../ui/Badge";
 import { formatDateFlexible } from "../../utils/date";
 import { InputCheckbox } from "../ui/Input";
 import { formatBRL } from "../../utils/formatters";
+import SimplePagination from "../ui/SimplePagination";
 
 export const TransactionTable = ({
   items = [],
   loading = false,
   selectedIds = new Set(),
   onToggleRow,
-  onToggleAll
+  onToggleAll,
+  currentPage = 1,
+  totalPages = 1,
+  totalCount = 0,
+  onPageChange
 }) => {
     const allIds = useMemo(() => items.map((r) => r.id), [items]);
     const allChecked = allIds.length > 0 && allIds.every((id) => selectedIds.has(id));
@@ -82,6 +87,14 @@ export const TransactionTable = ({
                 })}
                 </tbody>
             </table>
+            <div className="px-6 pb-4">
+                <SimplePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    onPageChange={onPageChange}
+                />
+            </div>
         </div>
     );
 };

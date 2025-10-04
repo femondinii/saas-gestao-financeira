@@ -56,57 +56,57 @@ export default function RegisterPage() {
             title="Blue Finance"
             subtitle="Crie uma conta para começar a gerenciar suas finanças"
         >
-        <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-            <Input
-                id="name"
-                label="Nome"
-                placeholder="Nome completo"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-            />
-            <Input
-                id="email"
-                label="Email"
-                type="email"
-                placeholder="exemplo@email.com"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-            <Input
-                id="password"
-                label="Senha"
-                autoComplete="new-password"
-                placeholder="********"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                isPassword
-            />
-            <FormError message={error} />
-                <Button type="submit" disabled={loading}>
-                    {loading ? "Cadastrando..." : "Cadastrar"}
-                </Button>
-            <SocialOAuthRow
-                onGoogle={() =>
-                    show({
-                    title: "Em breve",
-                    message: "Cadastro com Google ainda não está habilitado.",
-                    tone: "error",
-                    })
-                }
-            />
-        </form>
+            <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+                <Input
+                    id="name"
+                    label="Nome"
+                    placeholder="Nome completo"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                />
+                <Input
+                    id="email"
+                    label="Email"
+                    type="email"
+                    placeholder="exemplo@email.com"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <Input
+                    id="password"
+                    label="Senha"
+                    autoComplete="new-password"
+                    placeholder="********"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    isPassword
+                />
+                <FormError message={error} />
+                    <Button type="submit" disabled={loading}>
+                        {loading ? "Cadastrando..." : "Cadastrar"}
+                    </Button>
+                <SocialOAuthRow
+                    onGoogle={() =>
+                        show({
+                        title: "Em breve",
+                        message: "Cadastro com Google ainda não está habilitado.",
+                        tone: "error",
+                        })
+                    }
+                />
+            </form>
 
-        <p className="text-center text-sm mt-6 text-gray-600 dark:text-gray-400">
-            Já tem uma conta?{" "}
-            <a href="/login" className="text-blue-600 hover:underline">
-            Entre
-            </a>
-        </p>
-        <footer className="mt-10 text-center text-xs text-gray-400">
-            Blue Finance © 2025 – App de Gerenciamento Financeiro Pessoal
-        </footer>
-        <Toast toast={toast} onClose={hide} />
+            <p className="text-center text-sm mt-6 text-gray-600 dark:text-gray-400">
+                Já tem uma conta?{" "}
+                <a href="/login" className="text-blue-600 hover:underline">
+                Entre
+                </a>
+            </p>
+            <footer className="mt-10 text-center text-xs text-gray-400">
+                Blue Finance © 2025 – App de Gerenciamento Financeiro Pessoal
+            </footer>
+            <Toast toast={toast} onClose={hide} />
         </AuthLayout>
     );
 }

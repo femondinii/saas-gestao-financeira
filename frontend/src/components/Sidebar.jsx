@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
     BarChart3,
     CreditCard,
@@ -8,15 +8,17 @@ import {
     Settings,
     Sparkles,
     X,
+    LogOut,
 } from "lucide-react";
+import { api } from "../lib/api";
 
 export function Sidebar({ className = "" }) {
     const [collapsed, setCollapsed] = useState(false);
+    const navigate = useNavigate();
 
     const navigationItems = [
         { name: "Dashboard", icon: Home, path: "/" },
         { name: "Transações", icon: CreditCard, path: "/transactions" },
-        // { name: "Metas", icon: Goal, path: "/goals" },
         { name: "Planejamento IA", icon: Sparkles, path: "/ai-planning" },
     ];
 
@@ -25,6 +27,15 @@ export function Sidebar({ className = "" }) {
     const itemBase = "flex items-center gap-3 rounded-md px-3 py-2 transition-colors";
     const itemActive = "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300";
     const itemIdle = "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-900/60";
+
+    async function handleLogout() {
+        try {
+            await api.post("/accounts/auth/logout/", null, { withAuth: false });
+        } catch (_) {}
+        localStorage.removeItem("access_token");
+        sessionStorage.setItem("azul_logout_toast", "Sessão encerrada com segurança.");
+        navigate("/login", { replace: true });
+    }
 
     return (
         <aside className={`${base} ${width} ${className}`}>
@@ -65,7 +76,7 @@ export function Sidebar({ className = "" }) {
                 </NavLink>
             ))}
             </nav>
-            <div className="px-2">
+            <div className="px-2 space-y-1">
                 <NavLink
                     to="/settings"
                     className={({ isActive }) =>
@@ -76,6 +87,16 @@ export function Sidebar({ className = "" }) {
                     <Settings className="h-5 w-5 shrink-0" />
                     {!collapsed && <span className="truncate">Configurações</span>}
                 </NavLink>
+
+            <button
+                type="button"
+                onClick={handleLogout}
+                className={`${itemBase} ${itemIdle} w-full text-red-600`}
+                title={collapsed ? "Sair" : undefined}
+            >
+                <LogOut className="h-5 w-5 shrink-0" />
+                {!collapsed && <span className="truncate">Sair</span>}
+            </button>
             </div>
         </div>
         </aside>

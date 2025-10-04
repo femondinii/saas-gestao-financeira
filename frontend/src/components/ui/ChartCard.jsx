@@ -23,6 +23,8 @@ import {
     CardHeader,
     CardTitle
 } from './Card';
+import { LoadingOverlay } from './Spinner';
+import { EmptyState } from './EmptyState';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'];
 
@@ -31,7 +33,8 @@ export default function ChartCard({
     data,
     title,
     description,
-    icon
+    icon,
+    loading
 }) {
     const renderChart = () => {
         switch (type) {
@@ -132,6 +135,8 @@ export default function ChartCard({
         }
     };
 
+    const isEmpty = !data || (Array.isArray(data) && data.length === 0);
+
     return (
         <Card className="card-hover">
             <CardHeader>
@@ -144,11 +149,19 @@ export default function ChartCard({
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                        {renderChart()}
-                    </ResponsiveContainer>
-                </div>
+                {loading ? (
+                    <LoadingOverlay  />
+                ) : isEmpty ? (
+                    <EmptyState
+                        variant="charts"
+                    />
+                ) : (
+                    <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                            {renderChart()}
+                        </ResponsiveContainer>
+                    </div>
+                )}
             </CardContent>
         </Card>
     );

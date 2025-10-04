@@ -4,6 +4,8 @@ import { formatDateFlexible } from "../../utils/date";
 import { InputCheckbox } from "../ui/Input";
 import { formatBRL } from "../../utils/formatters";
 import SimplePagination from "../ui/SimplePagination";
+import { LoadingOverlay } from "../ui/Spinner";
+import { EmptyState } from "../ui/EmptyState";
 
 export const TransactionTable = ({
   items = [],
@@ -21,17 +23,15 @@ export const TransactionTable = ({
 
     if (loading) {
         return (
-            <div className="bg-white border border-gray-200 rounded-xl p-10 text-center text-gray-500">
-                Carregando...
-            </div>
+            <LoadingOverlay />
         );
     }
 
     if (!items.length) {
         return (
-            <div className="bg-white border border-gray-200 rounded-xl p-10 text-center text-gray-500">
-                Nenhuma transação encontrada.
-            </div>
+            <EmptyState
+                variant='transactions'
+            />
         );
     }
 

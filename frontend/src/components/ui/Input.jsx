@@ -4,44 +4,41 @@ import { Eye, EyeOff } from "lucide-react";
 export function Input({
     label,
     id,
-    hint,
     className = '',
-    inputClassName = '',
     isPassword = false,
     startIcon = null,
-    endIcon = null,
     ...props
 }) {
     const [show, setShow] = useState(false);
 
     const withLeftPadding = !!startIcon;
-    const withRightPadding = isPassword || !!endIcon;
+    const withRightPadding = isPassword;
 
     const computedInputClass = useMemo(() => {
         const left = withLeftPadding ? 'pl-9' : '';
         const right = withRightPadding ? 'pr-10' : '';
+
         return [
             "w-full rounded-lg border border-gray-300 dark:border-neutral-700",
             "bg-white dark:bg-neutral-900 px-3 py-2 outline-none",
             "focus:ring-2 focus:ring-blue-500",
             left,
             right,
-            inputClassName || ''
         ].join(' ');
-    }, [withLeftPadding, withRightPadding, inputClassName]);
+    }, [withLeftPadding, withRightPadding]);
 
     return (
         <div className={className}>
             {label && (
                 <label htmlFor={id} className="block text-sm font-medium mb-1">
-                {label}
+                    {label}
                 </label>
             )}
             <div className="relative">
                 {startIcon && (
-                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
-                    {startIcon}
-                </span>
+                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                        {startIcon}
+                    </span>
                 )}
 
                 <input
@@ -50,7 +47,7 @@ export function Input({
                     className={computedInputClass}
                     {...props}
                 />
-                {isPassword ? (
+                {isPassword && (
                     <button
                         type="button"
                         onClick={() => setShow(s => !s)}
@@ -59,15 +56,8 @@ export function Input({
                     >
                         {show ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
-                ) : (
-                endIcon && (
-                    <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
-                    {endIcon}
-                    </span>
-                )
                 )}
             </div>
-            {hint && <p className="mt-1 text-xs text-gray-500">{hint}</p>}
         </div>
     );
 }

@@ -1,5 +1,13 @@
 import { useMemo, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/Select";
+import { InputDate } from "../ui/Input";
+import { Button } from "../ui/Button";
 import {
   firstDayOfMonthISO,
   lastDayOfMonthISO,
@@ -7,132 +15,155 @@ import {
 } from "../../utils/date";
 
 export default function PeriodSelect({ dateStart, dateEnd, onChange }) {
-  const [openMenu, setOpenMenu] = useState(false);
   const [openCustom, setOpenCustom] = useState(false);
-  const [mode, setMode] = useState("this_month");
 
-  const label = useMemo(() => {
-    if (mode === "custom" && dateStart && dateEnd) {
+  const currentValue = useMemo(() => {
+    if (!dateStart || !dateEnd) {
+      return "";
+    }
+
+    const now = new Date();
+    const thisMonthStart = firstDayOfMonthISO(now);
+    const thisMonthEnd = lastDayOfMonthISO(now);
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const lastMonthStart = firstDayOfMonthISO(lastMonth);
+    const lastMonthEnd = lastDayOfMonthISO(lastMonth);
+
+    const dayOfWeek = now.getDay();
+    const diffFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - diffFromMonday);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    const thisWeekStart = weekStart.toISOString().slice(0, 10);
+    const thisWeekEnd = weekEnd.toISOString().slice(0, 10);
+
+    if (dateStart === thisMonthStart && dateEnd === thisMonthEnd) return "this_month";
+    if (dateStart === lastMonthStart && dateEnd === lastMonthEnd) return "last_month";
+    if (dateStart === thisWeekStart && dateEnd === thisWeekEnd) return "this_week";
+
+    return "custom";
+  }, [dateStart, dateEnd]);
+
+  const displayValue = useMemo(() => {
+    if (!dateStart || !dateEnd) return null;
+
+    if (currentValue === "custom") {
       return `De ${formatPtDate(dateStart)} até ${formatPtDate(dateEnd)}`;
     }
-    if (mode === "last_month") return "Último mês";
-    if (mode === "this_week") return "Esta semana";
-    if (mode === "this_month") return "Este mês";
-    return "Período";
-  }, [mode, dateStart, dateEnd]);
 
-  function applyRange(nextMode) {
+    const labels = {
+      this_month: "Este mês",
+      last_month: "Último mês",
+      this_week: "Esta semana"
+    };
+
+    return labels[currentValue];
+  }, [currentValue, dateStart, dateEnd]);
+
+  const generateDateRange = (period) => {
     const now = new Date();
-    let ds = dateStart;
-    let de = dateEnd;
 
-    if (nextMode === "this_month") {
-      ds = firstDayOfMonthISO(now);
-      de = lastDayOfMonthISO(now);
-    } else if (nextMode === "last_month") {
-      const d = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      ds = firstDayOfMonthISO(d);
-      de = lastDayOfMonthISO(d);
-    } else if (nextMode === "this_week") {
-      const day = now.getDay();
-      const diffFromMonday = day === 0 ? 6 : day - 1;
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - diffFromMonday);
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
-      ds = monday.toISOString().slice(0, 10);
-      de = sunday.toISOString().slice(0, 10);
+    switch (period) {
+      case "this_month":
+        return [firstDayOfMonthISO(now), lastDayOfMonthISO(now)];
+
+      case "last_month": {
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        return [firstDayOfMonthISO(lastMonth), lastDayOfMonthISO(lastMonth)];
+      }
+
+      case "this_week": {
+        const dayOfWeek = now.getDay();
+        const diffFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - diffFromMonday);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 6);
+        return [weekStart.toISOString().slice(0, 10), weekEnd.toISOString().slice(0, 10)];
+      }
+
+      default:
+        return [dateStart, dateEnd];
+    }
+  };
+
+  const handlePeriodChange = (period) => {
+    if (period === "custom") {
+      setOpenCustom(true);
+      return;
     }
 
-    setMode(nextMode);
-    setOpenMenu(false);
-    setOpenCustom(false);
-    onChange?.(ds, de, nextMode);
-  }
+    const [start, end] = generateDateRange(period);
+    onChange?.(start, end);
+  };
 
-  function openCustomPanel() {
-    setMode("custom");
-    setOpenCustom(true);
-  }
+  const handleCustomDateChange = (field, value) => {
+    const newStart = field === "start" ? value : dateStart;
+    const newEnd = field === "end" ? value : dateEnd;
+    onChange?.(newStart, newEnd);
+  };
+
+  const closeCustomPanel = () => {
+    setOpenCustom(false);
+  };
 
   return (
-    <div className={"relative lg:col-span-2"}>
-      <button
-        type="button"
-        onClick={() => setOpenMenu(v => !v)}
-        className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm outline-none flex items-center justify-between"
-      >
-        <span className={label.startsWith("De ") ? "text-gray-900" : "text-gray-500"}>{label}</span>
-        <ChevronDown className="h-4 w-4 text-gray-500" />
-      </button>
-
-      {openMenu && (
-        <div className="absolute z-30 mt-2 w-56 rounded-md border bg-white shadow">
-          <button
-            className="w-full px-3 py-2 text-left hover:bg-gray-50"
-            onClick={() => applyRange("last_month")}
-          >
-            Último mês
-          </button>
-          <button
-            className="w-full px-3 py-2 text-left hover:bg-gray-50"
-            onClick={() => applyRange("this_week")}
-          >
-            Esta semana
-          </button>
-          <button
-            className="w-full px-3 py-2 text-left hover:bg-gray-50"
-            onClick={() => applyRange("this_month")}
-          >
-            Este mês
-          </button>
-          <button
-            className="w-full px-3 py-2 text-left hover:bg-gray-50"
-            onClick={openCustomPanel}
-          >
-            Personalizado
-          </button>
-        </div>
-      )}
+    <div className="relative">
+      <Select value={currentValue} onValueChange={handlePeriodChange}>
+        <SelectTrigger className="h-10 w-full">
+          <SelectValue placeholder="Período">
+            {displayValue && (
+              <span className={currentValue === "custom" ? "text-gray-900" : "text-gray-700"}>
+                {displayValue}
+              </span>
+            )}
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="this_month">Este mês</SelectItem>
+          <SelectItem value="last_month">Último mês</SelectItem>
+          <SelectItem value="this_week">Esta semana</SelectItem>
+          <SelectItem value="custom">Personalizado</SelectItem>
+        </SelectContent>
+      </Select>
 
       {openCustom && (
-        <div className="absolute z-40 mt-2 w-80 rounded-md border bg-white p-4 shadow">
+        <div className="absolute z-40 mt-2 w-80 rounded-md border bg-white p-4 shadow-lg">
           <div className="mb-3 text-sm font-medium">Escolha o período</div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <div className="text-xs text-gray-600 mb-1">De</div>
-              <input
-                type="date"
-                value={dateStart || ""}
-                max={dateEnd || undefined}
-                onChange={(e) => onChange?.(e.target.value, dateEnd || e.target.value, "custom")}
-                className="h-9 w-full rounded-md border border-gray-300 bg-white px-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              <label className="block text-xs text-gray-600 mb-1">De</label>
+              <InputDate
+                value={dateStart}
+                max={dateEnd}
+                onChange={(value) => handleCustomDateChange("start", value)}
               />
             </div>
             <div>
-              <div className="text-xs text-gray-600 mb-1">Até</div>
-              <input
-                type="date"
-                value={dateEnd || ""}
-                min={dateStart || undefined}
-                onChange={(e) => onChange?.(dateStart || e.target.value, e.target.value, "custom")}
-                className="h-9 w-full rounded-md border border-gray-300 bg-white px-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              <label className="block text-xs text-gray-600 mb-1">Até</label>
+              <InputDate
+                value={dateEnd}
+                min={dateStart}
+                onChange={(value) => handleCustomDateChange("end", value)}
               />
             </div>
           </div>
           <div className="mt-3 flex justify-end gap-2">
-            <button
-              className="h-9 rounded-md border px-3 text-sm hover:bg-gray-50"
-              onClick={() => { setOpenCustom(false); setOpenMenu(false); }}
+            <Button
+              variant="outline"
+              onClick={closeCustomPanel}
+              className="h-9 w-auto px-3"
             >
               Fechar
-            </button>
-            <button
-              className="h-9 rounded-md bg-blue-600 px-3 text-sm text-white hover:bg-blue-700"
-              onClick={() => { setOpenCustom(false); setOpenMenu(false); }}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={closeCustomPanel}
+              className="h-9 w-auto px-3"
             >
               Aplicar
-            </button>
+            </Button>
           </div>
         </div>
       )}

@@ -26,7 +26,7 @@ export function StatsCard({
             </CardHeader>
             <CardContent className="px-6 pb-6">
                 <div className="text-2xl font-bold">
-                    {value}
+                    {value || '—'}
                 </div>
                 {(description || percentage) && (
                     <div className="mt-1 flex items-center text-xs">

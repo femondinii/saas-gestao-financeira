@@ -89,11 +89,6 @@ export function CategorySelect({
               {cat.name}
             </SelectItem>
           ))}
-          {items.length === 0 && (
-            <SelectItem value="__none" disabled>
-              Nenhuma categoria
-            </SelectItem>
-          )}
         </SelectContent>
       </Select>
     </div>

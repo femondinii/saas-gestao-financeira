@@ -38,11 +38,9 @@ export default function LoginPage() {
 		if (v) return setError(v);
 
 		setLoading(true);
+
 		try {
 			const res = await api.post("/accounts/auth/login/", { email, password }, { withAuth: false });
-
-			console.log(res);
-			console.log({ email, password });
 
 			if (!res.ok) {
 				const data = await res.json().catch(() => null);
@@ -53,10 +51,12 @@ export default function LoginPage() {
 			}
 
 			const data = await res.json();
-			if (!data?.access) throw new Error("Token de acesso não retornado pelo backend.");
+
+			if (!data?.access) {
+				throw new Error("Token de acesso não retornado pelo backend.");
+			}
 
 			localStorage.setItem("access_token", data.access);
-			if (data.refresh) localStorage.setItem("refresh_token", data.refresh);
 
 			navigate(redirectTo, { replace: true });
 			setTimeout(() => {
@@ -73,7 +73,7 @@ export default function LoginPage() {
 
 	return (
 		<AuthLayout title="Blue Finance" subtitle="Entre com sua conta para acessar o dashboard">
-			<form className="mt-8 space-y-4" onSubmit={handleSubmit}>
+			<form className="mt-8 space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
 				<Input
 					id="email"
 					label="Email"
@@ -93,7 +93,7 @@ export default function LoginPage() {
 					isPassword
 				/>
 				<FormError message={error} />
-				<Button type="submit" disabled={loading}>
+				<Button type="submit" disabled={loading} className="w-full">
 					{loading ? "Entrando..." : "Entrar"}
 				</Button>
 				<SocialOAuthRow

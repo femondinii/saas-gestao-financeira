@@ -5,72 +5,59 @@ function getApiBase() {
 
 const API_BASE = getApiBase();
 
-async function tryRefresh() {
-    const refresh = localStorage.getItem("refresh_token");
+async function refreshAccess() {
+    const res = await fetch(`${API_BASE}/accounts/auth/refresh/`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Accept": "application/json" }
+    });
 
-    if (!refresh) return false;
+    if (!res.ok) return null;
 
-    try {
-        const res = await fetch(`${API_BASE}/accounts/auth/refresh/`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refresh }),
-        });
+    const data = await res.json();
 
-        if (!res.ok) return false;
-
-        const data = await res.json();
-
-        if (data.access) localStorage.setItem("access_token", data.access);
-        if (data.refresh) localStorage.setItem("refresh_token", data.refresh);
-
-        return true;
-    } catch {
-        return false;
-    }
+    return data?.access || null;
 }
 
-export async function apiFetch(
-    path,
-    { method = "GET", body, headers = {}, withAuth = true } = {}
-    ) {
+export async function apiFetch(path, { method = "GET", body, headers = {}, withAuth = true } = {}) {
     const h = { Accept: "application/json", ...headers };
-    if (body && !h["Content-Type"]) h["Content-Type"] = "application/json";
+    const isJsonBody = body && !(body instanceof FormData) && !h["Content-Type"];
+
+    if (isJsonBody) h["Content-Type"] = "application/json";
+
+    const authPath = path.startsWith("/accounts/auth/");
 
     if (withAuth) {
         const access = localStorage.getItem("access_token");
         if (access) h["Authorization"] = `Bearer ${access}`;
     }
 
-    const res = await fetch(`${API_BASE}${path}`, {
+    const target = `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+    const init = {
         method,
         headers: h,
         body: body
-        ? typeof body === "string"
+        ? body instanceof FormData
+            ? body
+            : typeof body === "string"
             ? body
             : JSON.stringify(body)
         : undefined,
-        credentials: "omit",
-    });
+        credentials: authPath ? "include" : "omit",
+  };
 
-    if (res.status === 401 && withAuth) {
-        const ok = await tryRefresh();
+    let res = await fetch(target, init);
 
-        if (ok) {
-            const retryHeaders = {
-                ...h,
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            };
+    if (res.status === 401 && withAuth && !authPath) {
+        const newAccess = await refreshAccess();
 
-            return fetch(`${API_BASE}${path}`, {
-                method,
-                headers: retryHeaders,
-                body: body
-                ? typeof body === "string"
-                    ? body
-                    : JSON.stringify(body)
-                : undefined,
-            });
+        if (newAccess) {
+            localStorage.setItem("access_token", newAccess);
+            const retryHeaders = { ...h, Authorization: `Bearer ${newAccess}` };
+            const retryInit = { ...init, headers: retryHeaders };
+            res = await fetch(target, retryInit);
+        } else {
+            localStorage.removeItem("access_token");
         }
     }
 

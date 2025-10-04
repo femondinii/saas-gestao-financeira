@@ -15,14 +15,14 @@ import ChartCard from "../components/ui/ChartCard";
 import { useDashboardData } from "../hooks/useDashboardData";
 import { formatBRL, formatPercentage, getTrend } from "../utils/formatters";
 import { formatPtDate } from "../utils/date";
+import { LoadingOverlay, SpinnerInline } from "../components/ui/Spinner";
+import { EmptyState } from "../components/ui/EmptyState";
 
 export default function DashboardPage() {
-  const { stats, charts, loading, error, refetch } = useDashboardData();
+  const { stats, charts, loading } = useDashboardData();
 
   const formattedStats = useMemo(() => {
     if (!stats) return null;
-
-    const asOf = new Date(stats.as_of).toLocaleDateString("pt-BR");
 
     return {
       balance: formatBRL(stats.balance),
@@ -32,7 +32,7 @@ export default function DashboardPage() {
       expensesPercentage: formatPercentage(stats.expenses.change_pct),
       incomeTrend: getTrend(stats.income.change_pct),
       expenseTrend: getTrend(stats.expenses.change_pct),
-      asOf
+      asOf: formatPtDate(stats.as_of)
     };
   }, [stats]);
 
@@ -69,22 +69,6 @@ export default function DashboardPage() {
     }))
   }), [charts]);
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">Erro ao carregar dados: {error}</p>
-          <button
-            onClick={refetch}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Tentar Novamente
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
@@ -98,13 +82,13 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatsCard
           title="Saldo Atual"
-          value={formattedStats?.balance || "—"}
-          description={formattedStats ? `Atualizado em ${formattedStats.asOf}` : "Carregando..."}
+          value={formattedStats?.balance}
+          description={formattedStats ? `Atualizado em ${formattedStats.asOf}` : <SpinnerInline />}
           icon={<Wallet />}
         />
         <StatsCard
           title="Renda Mensal"
-          value={formattedStats?.income || "—"}
+          value={formattedStats?.income}
           percentage={formattedStats?.incomePercentage}
           trend={formattedStats?.incomeTrend}
           description="vs. mês anterior"
@@ -112,7 +96,7 @@ export default function DashboardPage() {
         />
         <StatsCard
           title="Despesas Mensais"
-          value={formattedStats?.expenses || "—"}
+          value={formattedStats?.expenses}
           percentage={formattedStats?.expensesPercentage}
           trend={formattedStats?.expenseTrend}
           description="vs. mês anterior"
@@ -126,15 +110,17 @@ export default function DashboardPage() {
           type="area"
           data={chartData.monthly}
           title="Fluxo de Caixa Mensal"
-          description={loading.charts ? "Carregando..." : "Comparativo de receitas e despesas dos últimos 6 meses"}
+          description={"Comparativo de receitas e despesas dos últimos 6 meses"}
           icon={<BarChart3 />}
+          loading={loading.charts}
         />
         <ChartCard
           type="bar"
           data={chartData.categories}
           title="Despesas por Categoria"
-          description={loading.charts ? "Carregando..." : "Distribuição de gastos do mês atual"}
+          description={"Distribuição de gastos do mês atual"}
           icon={<DollarSign />}
+          loading={loading.charts}
         />
       </div>
 
@@ -143,15 +129,17 @@ export default function DashboardPage() {
           type="line"
           data={chartData.balance}
           title="Evolução do Saldo"
-          description={loading.charts ? "Carregando..." : "Crescimento do saldo nos últimos 6 meses"}
+          description={"Crescimento do saldo nos últimos 6 meses"}
           icon={<LineChartIcon />}
+          loading={loading.charts}
         />
         <ChartCard
           type="pie"
           data={chartData.incomeSources}
           title="Receitas por Fonte"
-          description={loading.charts ? "Carregando..." : "Distribuição de receitas por origem"}
+          description={"Distribuição de receitas por origem"}
           icon={<PieChart />}
+          loading={loading.charts}
         />
       </div>
 
@@ -163,15 +151,13 @@ export default function DashboardPage() {
             <span>Transações Recentes</span>
           </CardTitle>
           <CardDescription>
-            {loading.charts ? "Carregando transações..." : "Últimas movimentações financeiras"}
+            Últimas movimentações financeiras
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             {loading.charts ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="text-gray-500">Carregando...</div>
-              </div>
+              <LoadingOverlay />
             ) : chartData.recent.length > 0 ? (
               chartData.recent.map(transaction => (
                 <div key={transaction.id} className="flex items-center justify-between rounded-lg border p-3">
@@ -190,9 +176,9 @@ export default function DashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="flex items-center justify-center py-8">
-                <div className="text-gray-500">Nenhuma transação encontrada</div>
-              </div>
+              <EmptyState
+                variant='transactions'
+              />
             )}
           </div>
         </CardContent>

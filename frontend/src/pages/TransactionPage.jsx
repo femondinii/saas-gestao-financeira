@@ -58,6 +58,7 @@ export default function TransactionsPage() {
   function resetSelection() {
     setSelectedIds(new Set());
   }
+
   function onToggleRow(id, checked) {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -66,6 +67,7 @@ export default function TransactionsPage() {
       return next;
     });
   }
+
   function onToggleAll(checked) {
     setSelectedIds(checked ? new Set(rows.map((r) => r.id)) : new Set());
   }
@@ -225,11 +227,10 @@ export default function TransactionsPage() {
           <CardTitle>Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="relative">
               <Input
                 placeholder="Buscar transações..."
-                className="pl-9"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 startIcon={

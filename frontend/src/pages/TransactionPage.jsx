@@ -24,6 +24,8 @@ import { api } from "../lib/api";
 import { EditTransactionModal } from "../components/transactions/EditTransactionModal";
 import { formatDateFlexible } from "../utils/date";
 import PeriodSelect from "../components/filters/PeriodSelect";
+import TitlePage from "../components/layout/TitlePage";
+import { WalletSelect } from "../components/wallets/WalletSelect";
 
 export default function TransactionsPage() {
   const [search, setSearch] = useState("");
@@ -49,11 +51,13 @@ export default function TransactionsPage() {
     dateStart: "",
     dateEnd: "",
     page: 1,
+    walletId: "",
   }));
 
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [openActions, setOpenActions] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [walletId, setWalletId] = useState("");
 
   function resetSelection() {
     setSelectedIds(new Set());
@@ -82,6 +86,7 @@ export default function TransactionsPage() {
         if (params.type === "income" || params.type === "expense") q.set("type", params.type);
         if (params.dateStart) q.set("date_start", params.dateStart);
         if (params.dateEnd) q.set("date_end", params.dateEnd);
+        if (params.walletId) q.set("wallet_id", params.walletId);
         q.set("ordering", "-date");
         q.set("page", params.page || 1);
         q.set("page_size", pageSize);
@@ -115,6 +120,8 @@ export default function TransactionsPage() {
           date: formatDateFlexible(t.date),
           amount: Number(t.amount),
           type: t.type,
+          wallet: t.wallet_detail?.name,
+          color: t.wallet_detail?.color
         }));
 
         setRows(mapped);
@@ -138,6 +145,7 @@ export default function TransactionsPage() {
       dateStart,
       dateEnd,
       page: 1,
+      walletId
     });
   }
 
@@ -154,6 +162,7 @@ export default function TransactionsPage() {
       dateStart: "",
       dateEnd: "",
       page: 1,
+      walletId: "",
     });
   }
 
@@ -204,6 +213,7 @@ export default function TransactionsPage() {
 
     const id = ids[0];
     const res = await api.get(`/finance/transactions/${id}/`);
+
     if (!res.ok) return;
 
     const t = await res.json();
@@ -216,10 +226,10 @@ export default function TransactionsPage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Transações</h1>
-          <p className="text-muted-foreground">Gerencie suas receitas e despesas</p>
-        </div>
+        <TitlePage
+          title="Transações"
+          subtitle="Gerencie suas receitas e despesas"
+        />
         <NewTransactionModal onTransactionCreated={handleCreated} />
       </div>
       <Card>
@@ -242,6 +252,11 @@ export default function TransactionsPage() {
               value={categoryId}
               onChange={setCategoryId}
               placeholder="Categoria"
+            />
+            <WalletSelect
+              value={walletId}
+              onChange={setWalletId}
+              placeholder="Carteira"
             />
             <Select value={type} onValueChange={setType}>
               <SelectTrigger className="h-10 w-full">

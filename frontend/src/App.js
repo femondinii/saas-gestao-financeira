@@ -3,8 +3,9 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import TransactionPage from "./pages/TransactionPage";
 import DashboardPage from "./pages/DashboardPage";
-import { Layout } from "./components/Layout";
+import { Layout } from "./components/layout/Layout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import WalletPage from "./pages/WalletPage";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<DashboardPage />} />
           <Route path="/transactions" element={<TransactionPage />} />
+          <Route path="/wallets" element={<WalletPage />} />
         </Route>
       </Route>
     </Routes>

@@ -2,7 +2,8 @@ import React from 'react';
 import {
     FileX,
     CreditCard,
-    PieChart
+    PieChart,
+    Wallet as WalletIcon
 } from 'lucide-react';
 
 export function EmptyState({ variant = 'default' }) {
@@ -21,6 +22,11 @@ export function EmptyState({ variant = 'default' }) {
             icon: PieChart,
             title: 'Dados insuficientes',
             description: 'Adicione algumas transações para visualizar os gráficos.'
+        },
+        wallets: {
+            icon: WalletIcon,
+            title: "Nenhuma carteira criada",
+            description: "Crie sua primeira carteira para organizar seus saldos e transações.",
         },
     };
 

@@ -6,17 +6,18 @@ import { formatBRL } from "../../utils/formatters";
 import SimplePagination from "../ui/SimplePagination";
 import { LoadingOverlay } from "../ui/Spinner";
 import { EmptyState } from "../ui/EmptyState";
+import { WalletBadge } from "../ui/WalletBadge";
 
 export const TransactionTable = ({
-  items = [],
-  loading = false,
-  selectedIds = new Set(),
-  onToggleRow,
-  onToggleAll,
-  currentPage = 1,
-  totalPages = 1,
-  totalCount = 0,
-  onPageChange
+    items = [],
+    loading = false,
+    selectedIds = new Set(),
+    onToggleRow,
+    onToggleAll,
+    currentPage = 1,
+    totalPages = 1,
+    totalCount = 0,
+    onPageChange
 }) => {
     const allIds = useMemo(() => items.map((r) => r.id), [items]);
     const allChecked = allIds.length > 0 && allIds.every((id) => selectedIds.has(id));
@@ -48,6 +49,7 @@ export const TransactionTable = ({
                             ariaLabel="Selecionar tudo"
                         />
                     </Th>
+                    <Th>Carteira</Th>
                     <Th>Descrição</Th>
                     <Th>Categoria</Th>
                     <Th>Data</Th>
@@ -59,13 +61,20 @@ export const TransactionTable = ({
                     const isSelected = selectedIds.has(t.id);
 
                     return (
-                        <tr key={t.id} className={isSelected ? "bg-blue-50/40" : "hover:bg-gray-50"}>
+                        <tr
+                            key={t.id}
+                            className={isSelected ? "bg-blue-50/40" : "hover:bg-gray-50"}
+                            onClick={() => onToggleRow?.(t.id, !isSelected)}
+                        >
                             <Td className="w-10 px-4">
                                 <InputCheckbox
                                     id={`checkbox-${t.id}`}
                                     checked={isSelected}
                                     onChange={(e) => onToggleRow?.(t.id, e.target.checked)}
                                 />
+                            </Td>
+                            <Td>
+                                <WalletBadge color={t.color}>{t.wallet}</WalletBadge>
                             </Td>
                             <Td>{t.description}</Td>
                             <Td>

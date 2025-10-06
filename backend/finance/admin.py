@@ -9,7 +9,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ("user","type","amount","date","category","status")
-    list_filter = ("type","status","category")
-    search_fields = ("description","notes","user__email")
+    list_display = ("user","type","amount","date","category")
+    list_filter = ("type","category")
+    search_fields = ("description","user__email")
     date_hierarchy = "date"

@@ -23,6 +23,7 @@ export function EditTransactionModal({
       categoryId: transaction.category || "",
       type: transaction.type || "",
       date: transaction.date || "",
+      walletId: transaction.wallet || "",
     });
   }, [open, transaction]);
 

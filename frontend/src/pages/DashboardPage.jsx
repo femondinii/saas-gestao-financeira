@@ -17,6 +17,8 @@ import { formatBRL, formatPercentage, getTrend } from "../utils/formatters";
 import { formatPtDate } from "../utils/date";
 import { LoadingOverlay, SpinnerInline } from "../components/ui/Spinner";
 import { EmptyState } from "../components/ui/EmptyState";
+import TitlePage from "../components/layout/TitlePage";
+import { Badge } from "../components/ui/Badge";
 
 export default function DashboardPage() {
   const { stats, charts, loading } = useDashboardData();
@@ -25,7 +27,7 @@ export default function DashboardPage() {
     if (!stats) return null;
 
     return {
-      balance: formatBRL(stats.balance),
+      balance: formatBRL(stats.net_worth),
       income: formatBRL(stats.income.current),
       expenses: formatBRL(stats.expenses.current),
       incomePercentage: formatPercentage(stats.income.change_pct),
@@ -71,12 +73,10 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Visão geral das suas finanças pessoais</p>
-        </div>
-      </div>
+      <TitlePage
+        title="Dashboard"
+        subtitle="Visão geral das suas finanças pessoais"
+      />
 
       {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -166,7 +166,9 @@ export default function DashboardPage() {
                     <div className="text-sm text-muted-foreground flex gap-2">
                       <span>{transaction.date}</span>
                       <span>•</span>
-                      <span className={transaction.category ? "" : "text-gray-400"}>{transaction.category || "Não preenchido"}</span>
+                      <Badge tone={`${transaction.category ? "neutral" : "default"}`}>
+                        {transaction.category || "Não preenchido"}
+                      </Badge>
                     </div>
                   </div>
                   <div className={transaction.type === "income" ? "text-green-600" : "text-red-600"}>

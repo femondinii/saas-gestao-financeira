@@ -57,6 +57,7 @@ export default function LoginPage() {
 			}
 
 			localStorage.setItem("access_token", data.access);
+			window.dispatchEvent(new Event("auth:token-updated"));
 
 			navigate(redirectTo, { replace: true });
 			setTimeout(() => {

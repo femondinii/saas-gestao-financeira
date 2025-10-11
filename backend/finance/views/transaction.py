@@ -198,11 +198,22 @@ class TransactionViewSet(viewsets.ModelViewSet):
             g = by_period.get(key)
             inc = g["income"] or Decimal("0.00") if g else Decimal("0.00")
             exp = g["expenses"] or Decimal("0.00") if g else Decimal("0.00")
-            out.append({"year": y, "month_num": m, "month": labels[m - 1], "income": str(inc), "expenses": str(exp)})
+
+            if inc != Decimal("0.00") or exp != Decimal("0.00"):
+                out.append({
+                    "year": y,
+                    "month_num": m,
+                    "month": labels[m - 1],
+                    "income": str(inc),
+                    "expenses": str(exp)
+                })
+
             m += 1
+
             if m > 12:
                 m = 1
                 y += 1
+
         return Response({"months": out}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"], url_path="expenses-by-category")
@@ -297,14 +308,20 @@ class TransactionViewSet(viewsets.ModelViewSet):
         running = prior
         y = start.year
         m = start.month
+
         for _ in range(months):
             key = f"{y:04d}-{m:02d}"
             running += by_period.get(key, Decimal("0.00"))
-            out.append({"year": y, "month_num": m, "month": labels[m - 1], "balance": str(running)})
+
+            if running != Decimal("0.00"):
+                out.append({"year": y, "month_num": m, "month": labels[m - 1], "balance": str(running)})
+
             m += 1
+
             if m > 12:
                 m = 1
                 y += 1
+
         return Response({"months": out, "opening_balance": str(prior)}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"], url_path="income-by-source")

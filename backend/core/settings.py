@@ -126,3 +126,5 @@ CSRF_COOKIE_SECURE = not DEBUG
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
 ]
+
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")

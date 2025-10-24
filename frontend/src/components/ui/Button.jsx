@@ -12,3 +12,15 @@ export function Button({ children, className = '', variant = 'primary', ...props
         <button className={`${base} ${variants[variant] || ''} ${className}`} {...props}>{children}</button>
     );
 }
+
+export function IconButton({ icon: Icon, className = '', ...props }) {
+    return (
+        <button
+            type="button"
+            className={`inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-neutral-800 ${className}`}
+            {...props}
+        >
+            <Icon className="h-4 w-4" />
+        </button>
+    );
+}

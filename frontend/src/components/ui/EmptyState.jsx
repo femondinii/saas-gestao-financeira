@@ -28,6 +28,11 @@ export function EmptyState({ variant = 'default' }) {
             title: "Nenhuma carteira criada",
             description: "Crie sua primeira carteira para organizar seus saldos e transações.",
         },
+        plans: {
+            icon: FileX,
+            title: "Nenhum plano financeiro criado",
+            description: "Comece usando um template de plano.",
+        }
     };
 
     const config = variants[variant];

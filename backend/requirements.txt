@@ -10,3 +10,5 @@ djangorestframework-simplejwt
 django-allauth
 bcrypt
 django-cors-headers==4.3
+groq>=0.9
+langdetect==1.0.9

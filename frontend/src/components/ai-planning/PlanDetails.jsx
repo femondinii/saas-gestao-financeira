@@ -33,7 +33,7 @@ const Chip = ({ children }) => (
 const fmtBRL = (v) => (v === null || v === undefined ? "—" : formatBRL(v));
 
 export default function PlanDetails({ plan, onBack }) {
-	const p = plan?.spec ? plan.spec : plan || {};
+	const p = useMemo(() => (plan?.spec ? plan.spec : plan) || {}, [plan]);
 
 	const llmGoals = useMemo(() => {
 		if (Array.isArray(p?.goals?.items)) return p.goals.items;

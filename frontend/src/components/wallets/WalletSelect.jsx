@@ -21,8 +21,9 @@ export function WalletSelect({
 
     async function refetch(selectByName) {
         setLoading(true);
+
         try {
-            const res = await api.get("/finance/wallets/?is_archived=false");
+            const res = await api.get("/finance/wallets/");
 
             if (!res.ok) return;
 
@@ -58,19 +59,25 @@ export function WalletSelect({
 
     return (
         <div className={"space-y-2"}>
-            {withCreate ? (
+            {withCreate && (
                 <Label>{label}</Label>
-            ) : null}
+            )}
             <Select value={value} onValueChange={onChange}>
                 <SelectTrigger className="h-10 w-full">
                     <SelectValue placeholder={loading ? "Carregando..." : placeholder} />
                 </SelectTrigger>
-                <SelectContent>
-                    {items.map((w) => (
-                        <SelectItem key={w.id} value={w.id}>
-                            {w.name}
-                        </SelectItem>
-                    ))}
+                <SelectContent className="max-h-40 overflow-y-auto">
+                    {items.length === 0 && !loading ? (
+                        <div className="flex items-center justify-center h-10 text-sm text-muted-foreground">
+                            Nenhuma carteira disponível
+                        </div>
+                    ) : (
+                        items.map((w) => (
+                            <SelectItem key={w.id} value={w.id}>
+                                {w.name}
+                            </SelectItem>
+                        ))
+                    )}
                 </SelectContent>
             </Select>
         </div>

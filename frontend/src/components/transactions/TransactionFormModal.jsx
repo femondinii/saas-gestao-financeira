@@ -63,7 +63,7 @@ export function TransactionFormModal({
 		(async () => {
 			setLoadingWallets(true);
 			try {
-				const res = await api.get("/finance/wallets/?is_archived=false");
+				const res = await api.get("/finance/wallets/");
 				const data = await res.json().catch(() => ({}));
 				const list = Array.isArray(data) ? data : (data.results ?? []);
 				setWallets(list);

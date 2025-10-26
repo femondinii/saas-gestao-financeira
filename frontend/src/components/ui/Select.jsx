@@ -81,7 +81,7 @@ export const SelectContent = ({ children, className = "" }) => {
   return (
     <div
       ref={contentRef}
-      className={`absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-200 bg-white shadow-md ${className}`}
+      className={`absolute z-50 mt-1 w-full overflow-auto rounded-md border border-gray-200 bg-white shadow-md ${className}`}
       style={{ minWidth: width }}
       onClick={(e) => e.stopPropagation()}
     >

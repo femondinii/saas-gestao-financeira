@@ -72,18 +72,23 @@ export function CategorySelect({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      {withCreate ? (
+      {withCreate && (
         <div className="flex items-center">
           <Label>Categoria</Label>
-          <CategoryCreateButton onCreated={handleCreated} className="ml-auto" />
+          <CategoryCreateButton
+            onCreated={handleCreated}
+            items={items}
+            refetch={refetch}
+            loading={loading}
+          />
         </div>
-      ) : null}
+      )}
 
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="h-10 w-full">
           <SelectValue placeholder={loading ? "Carregando..." : placeholder} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-h-40 overflow-y-auto">
           {items.map((cat) => (
             <SelectItem key={cat.id} value={cat.id}>
               {cat.name}

@@ -93,6 +93,7 @@ export default function DashboardPage() {
           trend={formattedStats?.incomeTrend}
           description="vs. mês anterior"
           icon={<TrendingUp />}
+          valueClassName="text-green-600"
         />
         <StatsCard
           title="Despesas Mensais"
@@ -101,6 +102,7 @@ export default function DashboardPage() {
           trend={formattedStats?.expenseTrend}
           description="vs. mês anterior"
           icon={<TrendingDown />}
+          valueClassName="text-red-600"
         />
       </div>
 

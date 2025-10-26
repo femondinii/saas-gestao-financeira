@@ -3,7 +3,8 @@ import {
     FileX,
     CreditCard,
     PieChart,
-    Wallet as WalletIcon
+    Wallet,
+    List
 } from 'lucide-react';
 
 export function EmptyState({ variant = 'default' }) {
@@ -24,7 +25,7 @@ export function EmptyState({ variant = 'default' }) {
             description: 'Adicione algumas transações para visualizar os gráficos.'
         },
         wallets: {
-            icon: WalletIcon,
+            icon: Wallet,
             title: "Nenhuma carteira criada",
             description: "Crie sua primeira carteira para organizar seus saldos e transações.",
         },
@@ -32,6 +33,10 @@ export function EmptyState({ variant = 'default' }) {
             icon: FileX,
             title: "Nenhum plano financeiro criado",
             description: "Comece usando um template de plano.",
+        },
+        categories: {
+            icon: List,
+            title: "Nenhuma categoria criada"
         }
     };
 
@@ -46,9 +51,11 @@ export function EmptyState({ variant = 'default' }) {
             <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {config.title}
             </h3>
-            <p className="mb-6 max-w-sm text-sm text-gray-500 dark:text-gray-400">
-                {config.description}
-            </p>
+            {config.description && (
+                <p className="mb-6 max-w-sm text-sm text-gray-500 dark:text-gray-400">
+                    {config.description}
+                </p>
+            )}
         </div>
     );
 }

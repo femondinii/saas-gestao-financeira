@@ -9,6 +9,7 @@ export function StatsCard({
     icon,
     trend,
     percentage,
+    valueClassName = "",
 }) {
     return (
         <Card className="overflow-hidden">
@@ -25,7 +26,7 @@ export function StatsCard({
                 </div>
             </CardHeader>
             <CardContent className="px-6 pb-6">
-                <div className="text-2xl font-bold">
+                <div className={`text-2xl font-bold ${valueClassName}`}>
                     {value || '—'}
                 </div>
                 {(description || percentage) && (
@@ -33,9 +34,9 @@ export function StatsCard({
                         {trend && (
                             <span
                                 className={cx(
-                                "mr-1",
-                                trend === "up" && "text-green-600 dark:text-green-500",
-                                trend === "down" && "text-red-600 dark:text-red-500"
+                                    "mr-1",
+                                    trend === "up" && "text-green-600 dark:text-green-500",
+                                    trend === "down" && "text-red-600 dark:text-red-500"
                                 )}
                             >
                                 {trend === "up" ? "↑" : "↓"}
@@ -44,9 +45,9 @@ export function StatsCard({
                         {percentage && (
                             <span
                                 className={cx(
-                                "mr-1 font-medium",
-                                trend === "up" && "text-green-600 dark:text-green-500",
-                                trend === "down" && "text-red-600 dark:text-red-500"
+                                    "mr-1 font-medium",
+                                    trend === "up" && "text-green-600 dark:text-green-500",
+                                    trend === "down" && "text-red-600 dark:text-red-500"
                                 )}
                             >
                                 {percentage}

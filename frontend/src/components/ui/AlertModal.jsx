@@ -22,7 +22,7 @@ export function AlertModal({
     if (!open) return null;
 
     return createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-[2010] flex items-center justify-center">
             <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
                 <div role="dialog" aria-modal="true" className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
                     <h2 className="text-lg font-semibold">{title}</h2>

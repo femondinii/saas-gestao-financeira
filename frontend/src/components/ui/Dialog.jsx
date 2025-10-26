@@ -1,11 +1,11 @@
 import React, {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useId,
-    useMemo,
-    useState,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
 } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
@@ -87,7 +87,7 @@ export const DialogTrigger = ({ asChild, children, className = "", ...props }) =
   );
 }
 
-export const DialogOverlay = ({ className = "", onClick, ...props }) => {
+const DialogOverlay = ({ className = "", onClick, ...props }) => {
   const { open, setOpen } = useDialog();
 
   if (!open) return null;
@@ -98,14 +98,19 @@ export const DialogOverlay = ({ className = "", onClick, ...props }) => {
         onClick?.(e);
         setOpen(false);
       }}
-      className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm ${className}`}
+      className={`fixed inset-0 z-[1000] bg-black/60 ${className}`}
       {...props}
     />
   );
   return createPortal(node, document.body);
 }
 
-export const DialogContent = ({ children, className = "", ...props }) => {
+export const DialogContent = ({
+  children,
+  className = "",
+  overlayClassName = "",
+  ...props
+}) => {
   const { open, titleId, descId } = useDialog();
   if (!open) return null;
 
@@ -116,7 +121,7 @@ export const DialogContent = ({ children, className = "", ...props }) => {
       aria-labelledby={titleId}
       aria-describedby={descId}
       onClick={(e) => e.stopPropagation()}
-      className={`fixed left-1/2 top-1/2 z-[60] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border border-gray-200 bg-white p-6 shadow-lg ${className}`}
+      className={`fixed left-1/2 top-1/2 z-[1010] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border border-gray-200 bg-white p-6 shadow-lg ${className}`}
       {...props}
     >
       {children}
@@ -126,7 +131,7 @@ export const DialogContent = ({ children, className = "", ...props }) => {
 
   return createPortal(
     <>
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName} />
       {node}
     </>,
     document.body

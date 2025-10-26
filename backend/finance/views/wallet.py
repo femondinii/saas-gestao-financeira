@@ -12,13 +12,7 @@ class WalletViewSet(viewsets.ModelViewSet):
     pagination_class = DefaultPagination
 
     def get_queryset(self):
-        qs = Wallet.objects.filter(user=self.request.user)
-        is_archived = self.request.query_params.get("is_archived")
-
-        if is_archived in ("true", "1"):
-            qs = qs.filter(is_archived=True)
-        elif is_archived in ("false", "0", None):
-            qs = qs.filter(is_archived=False)
+        qs = Wallet.objects.filter(user=self.request.user, is_archived=False)
         return qs.order_by("name")
 
     def perform_create(self, serializer):
@@ -39,11 +33,7 @@ class WalletViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], url_path="archive")
     def archive(self, request, pk=None):
         wallet = self.get_object()
-        if wallet.is_archived:
-            return Response({"detail": "Carteira já está arquivada."}, status=status.HTTP_400_BAD_REQUEST)
-
         wallet.is_archived = True
         wallet.save()
-
         serializer = self.get_serializer(wallet)
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -5,7 +5,6 @@ import {
     CreditCard,
     Home,
     Menu,
-    Settings,
     Sparkles,
     X,
     LogOut,
@@ -79,16 +78,6 @@ export function Sidebar({ className = "" }) {
                     ))}
                 </nav>
                 <div className="px-2 space-y-1">
-                    <NavLink
-                        to="/settings"
-                        className={({ isActive }) =>
-                        `${itemBase} ${isActive ? itemActive : itemIdle}`
-                        }
-                        title={collapsed ? "Configurações" : undefined}
-                    >
-                        <Settings className="h-5 w-5 shrink-0" />
-                        {!collapsed && <span className="truncate">Configurações</span>}
-                    </NavLink>
                     <button
                         type="button"
                         onClick={handleLogout}

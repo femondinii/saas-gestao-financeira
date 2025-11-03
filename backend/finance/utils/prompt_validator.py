@@ -1,6 +1,6 @@
 import re
-from typing import Tuple, List, Dict
-from .lang import detect_lang_code  # usa langdetect já instalado
+from typing import Dict
+from .lang import detect_lang_code
 
 MIN_LEN = 20
 MAX_LEN = 2000

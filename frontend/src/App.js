@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
 import TransactionPage from "./pages/TransactionPage";
 import DashboardPage from "./pages/DashboardPage";
 import { Layout } from "./components/layout/Layout";
@@ -10,6 +9,7 @@ import WalletPage from "./pages/WalletPage";
 import { ReauthToast } from "./components/auth/ReauthToast";
 import { scheduleAuthToast, cancelAuthToast } from "./lib/authWatcher";
 import AiPlanningPage from "./pages/AiPlanningPage";
+import AuthCallbackPage from "./pages/AuthCallbackPage";
 
 export default function App() {
 	const [showReauth, setShowReauth] = useState(false);
@@ -40,7 +40,7 @@ export default function App() {
 		<>
 			<Routes>
 				<Route path="/login" element={<LoginPage />} />
-				<Route path="/register" element={<RegisterPage />} />
+				<Route path="/auth/callback" element={<AuthCallbackPage />} />
 				<Route element={<ProtectedRoute />}>
 					<Route path="/" element={<Layout />}>
 						<Route index element={<DashboardPage />} />

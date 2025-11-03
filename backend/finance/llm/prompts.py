@@ -23,9 +23,6 @@ Responda SOMENTE em JSON válido, seguindo este schema:
 """
 
 def build_messages(payload: dict, *, context_dict: dict | None = None, meta: dict | None = None):
-    """
-    meta: dict opcional com {"intent": str, "lang": str, "warnings": [str]}
-    """
     objective = payload.get("objective") or "Criar um planejamento financeiro pessoal."
     persona = payload.get("persona") or "Perfil moderado, respostas em pt-BR."
     template = payload.get("template") or "generico"
@@ -34,6 +31,9 @@ def build_messages(payload: dict, *, context_dict: dict | None = None, meta: dic
     sys = (
         "Você é um planejador financeiro especializado em finanças pessoais brasileiras. "
         "Responda sempre em português do Brasil. "
+        "Você deve seguir o seguinte contexto financeiro: {ContextoFinanceiroJSON} "
+        "Detalhe bem o planejamento financeiro, incluindo objetivos, estratégias, riscos e recomendações. "
+        "Use análise preditiva para sugerir metas financeiras realistas e apontar riscos potenciais. "
         "Você APENAS responde sobre planejamento financeiro, orçamento, metas, dívidas e investimentos. "
         "Se for solicitado algo fora desse escopo, responda: 'Só posso ajudar com planejamento financeiro.' "
         "Retorne SOMENTE JSON conforme o schema indicado, sem comentários fora do JSON."

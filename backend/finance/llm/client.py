@@ -6,4 +6,4 @@ def get_groq_client():
 	return Groq(api_key=api_key)
 
 def get_groq_model():
-	return getattr(settings, "GROQ_MODEL", "llama-3.3-70b-versatile")
+	return getattr(settings, "GROQ_MODEL", "openai/gpt-oss-120b")

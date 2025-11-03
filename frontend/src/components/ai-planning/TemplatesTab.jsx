@@ -34,7 +34,7 @@ export default function TemplatesTab({ templates, selectedTemplate, onSelect, on
 		setLoadingText("Gerando o plano com IA…");
 		try {
 			const body = {
-				objective: selected.title,
+				objective: selected.description,
 				template: selected.title,
 				with_context: true,
 				save: false,

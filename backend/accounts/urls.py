@@ -1,9 +1,9 @@
-from django.urls import path
-from .views import RegisterView, LoginView, RefreshView, LogoutView, MeView
+from django.urls import path, include
+from .views import GoogleLoginView, GoogleCallbackView, RefreshView, LogoutView, MeView
 
 urlpatterns = [
-    path("auth/register/", RegisterView.as_view(), name="auth-register"),
-    path("auth/login/", LoginView.as_view(), name="auth-login"),
+    path("auth/google/", GoogleLoginView.as_view(), name="auth-google"),
+    path("auth/google/callback/", GoogleCallbackView.as_view(), name="auth-google-callback"),
     path("auth/refresh/", RefreshView.as_view(), name="auth-refresh"),
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("auth/me/", MeView.as_view(), name="auth-me"),

@@ -95,7 +95,7 @@ class AIPlanView(APIView):
             resp = client.chat.completions.create(
                 model=model,
                 messages=messages,
-                temperature=body.get("temperature", 0.4),
+                temperature=body.get("temperature", 0.5),
                 top_p=body.get("top_p", 1),
                 max_completion_tokens=body.get("max_tokens", 1500),
                 stream=False,

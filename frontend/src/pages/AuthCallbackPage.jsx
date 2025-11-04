@@ -39,7 +39,7 @@ export default function AuthCallbackPage() {
         };
 
         run();
-    }, []);
+    }, [location.search, navigate, show]);
 
     return (
         <div className="flex items-center justify-center min-h-screen">

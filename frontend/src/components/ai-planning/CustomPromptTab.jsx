@@ -9,9 +9,6 @@ import { validateFinancialPromptLocal, sanitizePromptLocal } from "../../utils/f
 import { useToast } from "../../hooks/useToast";
 import { Toast } from "../../components/ui/Toast";
 
-const API_PATH = "/finance/ai/plan/";
-const LOTTIE_URL = "https://lottie.host/020ea13d-0640-4080-b60b-5587bae71c7e/e1GwdVqNXN.lottie";
-
 export default function CustomPromptTab({ onSaved }) {
 	const [customPrompt, setCustomPrompt] = useState("");
 	const [issues, setIssues] = useState([]);
@@ -29,65 +26,49 @@ export default function CustomPromptTab({ onSaved }) {
 	const chars = customPrompt.length;
 
 	const handleGenerateFromPrompt = async () => {
-		if (!canGenerate) return;
+		if (!canGenerate) {
+			return;
+		}
+
 		setLoading(true);
 		setLoadingText("Gerando o plano com IA…");
 		setError("");
+
 		try {
 			const safePrompt = sanitizePromptLocal(customPrompt);
 			const body = {
 				prompt: safePrompt,
 				objective: "Plano Personalizado",
 				template: "custom",
-				with_context: true,
 				save: false,
 			};
-			const res = await api.post(API_PATH, body, { withAuth: true });
+			const res = await api.post("/finance/ai/plan/generate/", body, { withAuth: true });
 			const json = await res.json().catch(() => ({}));
-			if (!res.ok) throw new Error(json?.detail || json?.error || `HTTP ${res.status}`);
+
+			if (!res.ok) {
+				throw new Error(json?.detail || json?.error || `HTTP ${res.status}`);
+			}
+
 			const data = json?.data || {};
 			const plan = data.title ? data : { title: "Plano Personalizado", spec: data.spec || {} };
 			setGenerated(plan);
 			window.scrollTo({ top: 0, behavior: "smooth" });
-			show({ tone: "success", title: "Plano gerado", message: "Revise abaixo e salve se estiver ok" });
+			show({
+				tone: "success",
+				title: "Plano gerado",
+				message: "Revise abaixo e salve se estiver ok"
+			});
 		} catch (e) {
-			show({ tone: "error", title: "Falha ao gerar plano", message: e.message || "Tente novamente" });
+			show({
+				tone: "error",
+				title: "Falha ao gerar plano",
+				message: e.message || "Tente novamente"
+			});
 		} finally {
 			setLoading(false);
 			setLoadingText("");
 		}
 	};
-
-	const handleSave = async () => {
-		if (!generated) return;
-		setLoading(true);
-		setLoadingText("Salvando o plano…");
-		setError("");
-		try {
-			const safePrompt = sanitizePromptLocal(customPrompt);
-			const body = {
-				prompt: safePrompt,
-				objective: generated.title || "Plano Personalizado",
-				template: "custom",
-				with_context: true,
-				save: true,
-			};
-			const res = await api.post(API_PATH, body, { withAuth: true });
-			const json = await res.json().catch(() => ({}));
-			if (!res.ok) throw new Error(json?.detail || json?.error || `HTTP ${res.status}`);
-			setGenerated(null);
-			if (typeof onSaved === "function") onSaved(json?.data);
-			setCustomPrompt("");
-			show({ tone: "success", title: "Plano salvo", message: "Seu plano foi salvo com sucesso." });
-		} catch (e) {
-			show({ tone: "error", title: "Erro ao salvar plano", message: e.message || "Tente novamente." });
-		} finally {
-			setLoading(false);
-			setLoadingText("");
-		}
-	};
-
-	const handleCancel = () => setGenerated(null);
 
 	return (
 		<div className="space-y-4 relative">
@@ -95,7 +76,11 @@ export default function CustomPromptTab({ onSaved }) {
 				<div className="absolute inset-0 z-20 grid place-items-center bg-white/70 dark:bg-neutral-950/60 backdrop-blur-sm">
 					<div className="flex flex-col items-center gap-3 p-4">
 						<div className="w-40 h-40">
-							<DotLottieReact src={LOTTIE_URL} loop autoplay />
+							<DotLottieReact
+								src={"https://lottie.host/020ea13d-0640-4080-b60b-5587bae71c7e/e1GwdVqNXN.lottie"}
+								loop
+								autoplay
+							/>
 						</div>
 						<p className="text-sm text-muted-foreground">{loadingText || "Processando…"}</p>
 					</div>
@@ -170,24 +155,13 @@ export default function CustomPromptTab({ onSaved }) {
 
 			{generated ? (
 				<div className={`${loading ? "pointer-events-none select-none opacity-60" : ""} space-y-3`}>
-					<PlanDetails plan={generated} onBack={handleCancel} />
-					<div className="flex flex-col sm:flex-row gap-2">
-						<Button
-							variant="outline"
-							onClick={handleCancel}
-							disabled={loading}
-							className="w-full sm:w-auto gap-2 inline-flex items-center p-3"
-						>
-							Cancelar
-						</Button>
-						<Button
-							onClick={handleSave}
-							disabled={loading}
-							className="w-full sm:w-auto gap-2 inline-flex items-center p-3"
-						>
-							Salvar
-						</Button>
-					</div>
+					<PlanDetails
+						plan={generated}
+						onBack={() => setGenerated(null)}
+						isCreating={true}
+						template={"custom"}
+						onSave={onSaved}
+					/>
 				</div>
 			) : null}
 

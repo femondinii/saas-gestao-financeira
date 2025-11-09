@@ -62,7 +62,14 @@ def classify_intent(s: str) -> str:
     return "general_finance"
 
 def validate_and_classify_prompt(prompt: str) -> Dict:
-    out = {"is_valid": True, "errors": [], "warnings": [], "lang": None, "intent": "general_finance", "normalized": ""}
+    out = {
+        "is_valid": True,
+        "errors": [],
+        "warnings": [],
+        "lang": None,
+        "intent": "general_finance",
+        "normalized": ""
+    }
 
     if not prompt or not isinstance(prompt, str):
         out["is_valid"] = False

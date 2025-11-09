@@ -31,10 +31,6 @@ class Transaction(models.Model):
 		]
 		ordering = ["-date", "-created_at"]
 
-	def __str__(self):
-		sign = "-" if self.type == self.Type.EXPENSE else "+"
-		return f"{self.user} {sign}R${self.amount} em {self.date}"
-
 	@property
 	def signed_amount(self):
 		return self.amount if self.type == self.Type.INCOME else -self.amount

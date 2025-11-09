@@ -33,7 +33,3 @@ class Category(models.Model):
 			models.Index(fields=["user", "is_archived"]),
 		]
 		ordering = ["name"]
-
-	def __str__(self):
-		who = "global" if self.user_id is None else self.user
-		return f"{self.name} ({who})"

@@ -2,15 +2,28 @@ import {
 	Card,
 	CardHeader,
 	CardTitle,
-	CardDescription,
-	CardFooter
+	CardDescription
 } from "../../components/ui/Card";
 import { IconButton } from "../../components/ui/Button";
-import { Calendar, FileText, Eye, Trash2 } from "lucide-react";
-import { getStatusColor } from "./constants";
+import {
+	Calendar,
+	FileText,
+	Eye,
+	Trash2
+} from "lucide-react";
 import { EmptyState } from "../ui/EmptyState";
+import { useEffect } from "react";
 
-export default function PlansList({ plans, onSelect, onRemove }) {
+export default function PlansList({
+	plans,
+	onSelect,
+	onRemove,
+	refresh
+}) {
+	useEffect(() => {
+		refresh();
+	}, [refresh]);
+
 	return (
 		<div className="space-y-4">
 			<div className="flex items-center justify-between">
@@ -53,11 +66,6 @@ export default function PlansList({ plans, onSelect, onRemove }) {
                                     </div>
 								</div>
 							</CardHeader>
-							<CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
-								<span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(plan.status)}`}>
-									{plan.status}
-								</span>
-							</CardFooter>
 						</Card>
 					))}
 				</div>

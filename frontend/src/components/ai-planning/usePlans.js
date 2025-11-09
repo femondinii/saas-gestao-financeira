@@ -25,8 +25,7 @@ export function usePlans() {
 				id: p.id,
 				title: p.title || "Plano Financeiro",
 				templateTitle: p.template || "—",
-				createdAt: p.created_at || p.createdAt || null,
-				status: p.status || "Ativo",
+				createdAt: p.created_at || null,
 				description: p.description || p?.spec?.overview?.summary || "",
 				spec: p.spec || null,
 			}));

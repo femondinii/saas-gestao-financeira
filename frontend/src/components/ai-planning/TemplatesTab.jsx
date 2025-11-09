@@ -14,9 +14,6 @@ import { Toast } from "../../components/ui/Toast";
 import { useToast } from "../../hooks/useToast";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
-const API_PATH = "/finance/ai/plan/";
-const LOTTIE_URL = "https://lottie.host/020ea13d-0640-4080-b60b-5587bae71c7e/e1GwdVqNXN.lottie";
-
 export default function TemplatesTab({ templates, selectedTemplate, onSelect, onSaved }) {
 	const [loading, setLoading] = useState(false);
 	const [loadingText, setLoadingText] = useState("");
@@ -29,17 +26,20 @@ export default function TemplatesTab({ templates, selectedTemplate, onSelect, on
 	);
 
 	const handleGenerate = async () => {
-		if (!selected) return;
+		if (!selected) {
+			return;
+		}
+
 		setLoading(true);
 		setLoadingText("Gerando o plano com IA…");
+
 		try {
 			const body = {
 				objective: selected.description,
 				template: selected.title,
-				with_context: true,
 				save: false,
 			};
-			const res = await api.post(API_PATH, body, { withAuth: true });
+			const res = await api.post("/finance/ai/plan/generate/", body, { withAuth: true });
 			const json = await res.json().catch(() => ({}));
 
 			if (!res.ok) {
@@ -50,45 +50,22 @@ export default function TemplatesTab({ templates, selectedTemplate, onSelect, on
 			const plan = data.title ? data : { title: selected.title, spec: data.spec || {} };
 			setGenerated(plan);
 			window.scrollTo({ top: 0, behavior: "smooth" });
-			show({ tone: "success", title: "Plano gerado", message: "Revise abaixo e salve se estiver ok." });
+			show({
+				tone: "success",
+				title: "Plano gerado",
+				message: "Revise abaixo e salve."
+			});
 		} catch (e) {
-			show({ tone: "error", title: "Falha ao gerar plano", message: e.message || "Tente novamente." });
+			show({
+				tone: "error",
+				title: "Falha ao gerar plano",
+				message: e.message || "Tente novamente."
+			});
 		} finally {
 			setLoading(false);
 			setLoadingText("");
 		}
 	};
-
-	const handleSave = async () => {
-		if (!generated) return;
-		setLoading(true);
-		setLoadingText("Salvando o plano…");
-		try {
-			const body = {
-				objective: generated.title || selected?.title || "Plano Financeiro",
-				template: selected?.title || "generico",
-				with_context: true,
-				save: true,
-			};
-			const res = await api.post(API_PATH, body, { withAuth: true });
-			const json = await res.json().catch(() => ({}));
-
-			if (!res.ok) {
-				throw new Error(json?.detail || json?.error || `HTTP ${res.status}`);
-			}
-
-			setGenerated(null);
-			if (typeof onSaved === "function") onSaved(json?.data);
-			show({ tone: "success", title: "Plano salvo", message: "Seu plano foi salvo com sucesso." });
-		} catch (e) {
-			show({ tone: "error", title: "Erro ao salvar plano", message: e.message || "Tente novamente." });
-		} finally {
-			setLoading(false);
-			setLoadingText("");
-		}
-	};
-
-	const handleCancel = () => setGenerated(null);
 
 	return (
 		<div className="space-y-6 relative">
@@ -96,7 +73,11 @@ export default function TemplatesTab({ templates, selectedTemplate, onSelect, on
 				<div className="absolute inset-0 z-20 grid place-items-center bg-white/70 dark:bg-neutral-950/60 backdrop-blur-sm">
 					<div className="flex flex-col items-center gap-3 p-4">
 						<div className="w-40 h-40">
-							<DotLottieReact src={LOTTIE_URL} loop autoplay />
+							<DotLottieReact
+								src={"https://lottie.host/020ea13d-0640-4080-b60b-5587bae71c7e/e1GwdVqNXN.lottie"}
+								loop
+								autoplay
+							/>
 						</div>
 						<p className="text-sm text-muted-foreground">{loadingText || "Processando…"}</p>
 					</div>
@@ -157,16 +138,11 @@ export default function TemplatesTab({ templates, selectedTemplate, onSelect, on
 				<div className={`${loading ? "pointer-events-none select-none opacity-60" : ""} space-y-3`}>
 					<PlanDetails
 						plan={generated}
-						onBack={handleCancel}
+						onBack={() => setGenerated(null)}
+						template={selected.title}
+						isCreating
+						onSaved={onSaved}
 					/>
-					<div className="flex flex-col sm:flex-row gap-2">
-						<Button variant="outline" onClick={handleCancel} disabled={loading} className="w-full sm:w-auto inline-flex items-center gap-2 p-3">
-							Cancelar
-						</Button>
-						<Button onClick={handleSave} disabled={loading} className="w-full sm:w-auto inline-flex items-center gap-2 p-3">
-							{loading ? "Salvando..." : "Salvar"}
-						</Button>
-					</div>
 				</div>
 			) : null}
 

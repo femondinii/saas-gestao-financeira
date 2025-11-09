@@ -20,6 +20,3 @@ class AIPlan(models.Model):
 			models.Index(fields=["user", "-created_at"]),
 		]
 		ordering = ["-created_at"]
-
-	def __str__(self):
-		return f"{self.title} ({self.user})"

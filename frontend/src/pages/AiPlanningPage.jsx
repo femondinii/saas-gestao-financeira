@@ -68,6 +68,7 @@ export default function AiPlanningPage() {
 						plans={plans}
 						onSelect={handlePlansSelect}
 						onRemove={openDeleteModal}
+						refresh={refresh}
 					/>
 				</>
 			)}

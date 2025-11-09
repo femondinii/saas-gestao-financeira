@@ -9,7 +9,13 @@ import {
   LineChart as LineChartIcon,
   PieChart
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/Card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from "../components/ui/Card";
 import { StatsCard } from "../components/ui/StatsCard";
 import ChartCard from "../components/ui/ChartCard";
 import { useDashboardData } from "../hooks/useDashboardData";
@@ -78,7 +84,6 @@ export default function DashboardPage() {
         subtitle="Visão geral das suas finanças pessoais"
       />
 
-      {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatsCard
           title="Saldo Atual"
@@ -105,88 +110,87 @@ export default function DashboardPage() {
           valueClassName="text-red-600"
         />
       </div>
-
-      {/* Charts */}
+      <div className="grid gap-4 md:grid-cols-12">
+        <div className="md:col-span-7 space-y-4">
+          <ChartCard
+            type="area"
+            data={chartData.monthly}
+            title="Fluxo de Caixa Mensal"
+            description="Comparativo de receitas e despesas dos últimos 6 meses"
+            icon={<BarChart3 />}
+            loading={loading.charts}
+            className="h-[320px]"
+          />
+          <ChartCard
+            type="line"
+            data={chartData.balance}
+            title="Evolução do Saldo"
+            description="Crescimento do saldo nos últimos 6 meses"
+            icon={<LineChartIcon />}
+            loading={loading.charts}
+            className="h-[320px]"
+          />
+        </div>
+        <div className="md:col-span-5">
+          <Card className="h-full card-hover">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-blue-500" />
+                <span>Transações Recentes</span>
+              </CardTitle>
+              <CardDescription>
+                Últimas 10 movimentações financeiras
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2 max-h-[890px] overflow-auto">
+              {loading.charts ? (
+                <LoadingOverlay />
+              ) : chartData.recent.length > 0 ? (
+                chartData.recent.map(transaction => (
+                  <div key={transaction.id} className="flex items-center justify-between rounded-lg border p-3">
+                    <div>
+                      <div className={`${transaction.description ? "font-semibold" : "text-gray-400"}`}>
+                        {transaction.description || "Não preenchido"}
+                      </div>
+                      <div className="text-sm text-muted-foreground flex gap-2">
+                        <span>{transaction.date}</span>
+                        <span>•</span>
+                        <Badge tone={`${transaction.category ? "neutral" : "default"}`}>
+                          {transaction.category || "Não preenchido"}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className={transaction.type === "income" ? "text-green-600" : "text-red-600"}>
+                      {transaction.type === "income" ? "+ " : "- "}
+                      {formatBRL(transaction.amount)}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <EmptyState variant="transactions" />
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
         <ChartCard
-          type="area"
-          data={chartData.monthly}
-          title="Fluxo de Caixa Mensal"
-          description={"Comparativo de receitas e despesas dos últimos 6 meses"}
-          icon={<BarChart3 />}
+          type="pie"
+          data={chartData.incomeSources}
+          title="Receitas por Fonte"
+          description="Distribuição de receitas por origem"
+          icon={<PieChart />}
           loading={loading.charts}
         />
         <ChartCard
           type="bar"
           data={chartData.categories}
           title="Despesas por Categoria"
-          description={"Distribuição de gastos do mês atual"}
+          description="Distribuição de gastos do mês atual"
           icon={<DollarSign />}
           loading={loading.charts}
         />
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <ChartCard
-          type="line"
-          data={chartData.balance}
-          title="Evolução do Saldo"
-          description={"Crescimento do saldo nos últimos 6 meses"}
-          icon={<LineChartIcon />}
-          loading={loading.charts}
-        />
-        <ChartCard
-          type="pie"
-          data={chartData.incomeSources}
-          title="Receitas por Fonte"
-          description={"Distribuição de receitas por origem"}
-          icon={<PieChart />}
-          loading={loading.charts}
-        />
-      </div>
-
-      {/* Recent Transactions */}
-      <Card className="card-hover">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-blue-500" />
-            <span>Transações Recentes</span>
-          </CardTitle>
-          <CardDescription>
-            Últimas movimentações financeiras
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {loading.charts ? (
-              <LoadingOverlay />
-            ) : chartData.recent.length > 0 ? (
-              chartData.recent.map(transaction => (
-                <div key={transaction.id} className="flex items-center justify-between rounded-lg border p-3">
-                  <div>
-                    <div className={`${transaction.description ? "font-semibold" : "text-gray-400"}`}>{transaction.description || "Não preenchido"}</div>
-                    <div className="text-sm text-muted-foreground flex gap-2">
-                      <span>{transaction.date}</span>
-                      <span>•</span>
-                      <Badge tone={`${transaction.category ? "neutral" : "default"}`}>
-                        {transaction.category || "Não preenchido"}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className={transaction.type === "income" ? "text-green-600" : "text-red-600"}>
-                    {transaction.type === "income" ? "+ " : "- "}
-                    {formatBRL(transaction.amount)}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <EmptyState
-                variant='transactions'
-              />
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

@@ -8,7 +8,8 @@ import {
     Sparkles,
     X,
     LogOut,
-    Wallet
+    Wallet,
+    Settings
 } from "lucide-react";
 import { api } from "../../lib/api";
 
@@ -20,7 +21,7 @@ export function Sidebar({ className = "" }) {
         { name: "Dashboard", icon: Home, path: "/" },
         { name: "Transações", icon: CreditCard, path: "/transactions" },
         { name: "Carteiras", icon: Wallet, path: "/wallets" },
-        { name: "Planejamento IA", icon: Sparkles, path: "/ai-planning" },
+        { name: "Planejamento IA", icon: Sparkles, path: "/ai-planning" }
     ];
 
     const base = "flex h-screen flex-col border-r bg-white dark:bg-neutral-950 text-gray-800 dark:text-gray-100 transition-all duration-300";
@@ -78,6 +79,15 @@ export function Sidebar({ className = "" }) {
                     ))}
                 </nav>
                 <div className="px-2 space-y-1">
+                    <button
+                        type="button"
+                        onClick={() => navigate("/settings")}
+                        className={`${itemBase} ${itemIdle} w-full`}
+                        title={collapsed ? "Configurações" : undefined}
+                    >
+                        <Settings className="h-5 w-5 shrink-0" />
+                        {!collapsed && <span className="truncate">Configurações</span>}
+                    </button>
                     <button
                         type="button"
                         onClick={handleLogout}

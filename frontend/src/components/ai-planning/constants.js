@@ -7,19 +7,6 @@ export const AI_TEMPLATES = [
     { id: 6, title: "Viagem dos Sonhos", description: "Planejamento financeiro para realizar uma viagem especial.", tags: ["Lazer", "Curto Prazo"] },
 ];
 
-export const getStatusColor = (status) => {
-    switch (status) {
-        case "Ativo":
-            return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-        case "Em Progresso":
-            return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-        case "Concluído":
-            return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
-        default:
-            return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300";
-    }
-};
-
 export const getSeverityColor = (severity) => {
     switch (severity) {
         case "Alto":

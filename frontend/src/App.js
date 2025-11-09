@@ -10,6 +10,7 @@ import { ReauthToast } from "./components/auth/ReauthToast";
 import { scheduleAuthToast, cancelAuthToast } from "./lib/authWatcher";
 import AiPlanningPage from "./pages/AiPlanningPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
+import SettingsPage from "./pages/SettingsPage";
 
 export default function App() {
 	const [showReauth, setShowReauth] = useState(false);
@@ -47,6 +48,7 @@ export default function App() {
 						<Route path="/transactions" element={<TransactionPage />} />
 						<Route path="/wallets" element={<WalletPage />} />
 						<Route path="/ai-planning" element={<AiPlanningPage />} />
+						<Route path="/settings" element={<SettingsPage />} />
 					</Route>
 				</Route>
 			</Routes>

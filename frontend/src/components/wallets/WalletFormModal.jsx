@@ -113,15 +113,15 @@ export function WalletFormModal({
                     <Label>Tipo</Label>
                     <Select value={kind} onValueChange={setKind}>
                         <SelectTrigger className="h-10 w-full">
-                        <SelectValue placeholder="Selecione o tipo" />
+                          <SelectValue placeholder="Selecione o tipo" />
                         </SelectTrigger>
-                        <SelectContent>
-                        <SelectItem value="checking">Conta corrente</SelectItem>
-                        <SelectItem value="savings">Poupança</SelectItem>
-                        <SelectItem value="cash">Dinheiro</SelectItem>
-                        <SelectItem value="credit">Cartão de crédito</SelectItem>
-                        <SelectItem value="investment">Investimento</SelectItem>
-                        <SelectItem value="other">Outros</SelectItem>
+                          <SelectContent>
+                          <SelectItem value="checking">Conta corrente</SelectItem>
+                          <SelectItem value="savings">Poupança</SelectItem>
+                          <SelectItem value="cash">Dinheiro</SelectItem>
+                          <SelectItem value="credit">Cartão de crédito</SelectItem>
+                          <SelectItem value="investment">Investimento</SelectItem>
+                          <SelectItem value="other">Outros</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

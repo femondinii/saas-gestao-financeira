@@ -6,6 +6,12 @@ __pycache__/
 *.pyo
 *.pyd
 *.log
+*.coverage
+.coveragerc
+.pytest_cache/
+.coverage.*
+coverage.xml
+frontend/coverage/
 
 # Virtual env
 venv/

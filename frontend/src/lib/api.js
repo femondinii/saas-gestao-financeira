@@ -39,7 +39,9 @@ export async function apiFetch(path, { method = "GET", body, headers = {}, withA
 	const h = { Accept: "application/json", ...headers };
 	const isJsonBody = body && !(body instanceof FormData) && !h["Content-Type"];
 
-	if (isJsonBody) h["Content-Type"] = "application/json";
+	if (isJsonBody) {
+		h["Content-Type"] = "application/json";
+	}
 
 	const authPath = path.startsWith("/accounts/auth/");
 
@@ -86,6 +88,5 @@ export const api = {
 	get: (p, o) => apiFetch(p, { ...o, method: "GET" }),
 	post: (p, b, o) => apiFetch(p, { ...o, method: "POST", body: b }),
 	put: (p, b, o) => apiFetch(p, { ...o, method: "PUT", body: b }),
-	patch: (p, b, o) => apiFetch(p, { ...o, method: "PATCH", body: b }),
 	del: (p, o) => apiFetch(p, { ...o, method: "DELETE" }),
 };

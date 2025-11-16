@@ -17,6 +17,7 @@ export function EditTransactionModal({
     }
     if (!transaction) return;
     const n = Number(transaction.amount);
+
     setInitialValues({
       description: transaction.description || "",
       amount: Number.isFinite(n) ? n : 0,
@@ -29,6 +30,7 @@ export function EditTransactionModal({
 
   async function submit(payload) {
     const res = await api.patch(`/finance/transactions/${transaction.id}/`, payload);
+
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
       const first =

@@ -14,7 +14,7 @@ import {
 import { api } from "../../lib/api";
 
 export function Sidebar({ className = "" }) {
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(true);
     const navigate = useNavigate();
 
     const navigationItems = [
@@ -83,7 +83,7 @@ export function Sidebar({ className = "" }) {
                         type="button"
                         onClick={() => navigate("/settings")}
                         className={`${itemBase} ${itemIdle} w-full`}
-                        title={collapsed ? "Configurações" : undefined}
+                        title={collapsed && "Configurações"}
                     >
                         <Settings className="h-5 w-5 shrink-0" />
                         {!collapsed && <span className="truncate">Configurações</span>}
@@ -92,7 +92,7 @@ export function Sidebar({ className = "" }) {
                         type="button"
                         onClick={handleLogout}
                         className={`${itemBase} ${itemIdle} w-full text-red-600`}
-                        title={collapsed ? "Sair" : undefined}
+                        title={collapsed && "Sair"}
                     >
                         <LogOut className="h-5 w-5 shrink-0" />
                         {!collapsed && <span className="truncate">Sair</span>}

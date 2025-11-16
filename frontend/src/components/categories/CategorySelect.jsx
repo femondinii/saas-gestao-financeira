@@ -22,9 +22,14 @@ export function CategorySelect({
 
   async function refetch(selectByName) {
     setLoading(true);
+
     try {
       const res = await api.get("/finance/categories/");
-      if (!res.ok) return;
+
+      if (!res.ok) {
+        return;
+      }
+
       const data = await res.json().catch(() => ({}));
       const list = Array.isArray(data) ? data : (data.results ?? []);
       const mapped = list

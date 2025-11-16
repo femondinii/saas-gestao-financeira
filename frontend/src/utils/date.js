@@ -1,9 +1,9 @@
 const toISO = (d) => {
-  const dt = typeof d === "string" ? new Date(d) : d;
-  const off = dt.getTimezoneOffset();
-  const local = new Date(dt.getTime() - off * 60 * 1000);
+    const dt = typeof d === "string" ? new Date(d) : d;
+    const off = dt.getTimezoneOffset();
+    const local = new Date(dt.getTime() - off * 60 * 1000);
 
-  return local.toISOString().slice(0, 10);
+    return local.toISOString().slice(0, 10);
 }
 
 export const firstDayOfMonthISO = (d = new Date()) => {

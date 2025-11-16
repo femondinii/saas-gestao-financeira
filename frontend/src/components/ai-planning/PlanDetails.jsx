@@ -32,7 +32,6 @@ export default function PlanDetails({
 	plan,
 	onBack,
 	isCreating = false,
-	template,
 	onSaved
 }) {
 	const [saving, setSaving] = useState(false);

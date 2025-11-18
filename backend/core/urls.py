@@ -19,5 +19,5 @@ urlpatterns = [
     path("api/finance/", include("finance.urls")),
 
     # Rotas de métricas Prometheus
-    path("metrics/", include("django_prometheus.urls")),
+    path("", include("django_prometheus.urls")),
 ]

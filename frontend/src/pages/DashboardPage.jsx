@@ -44,51 +44,68 @@ export default function DashboardPage() {
     };
   }, [stats]);
 
-  const chartData = useMemo(() => ({
-    monthly: charts.monthly.map(m => ({
-      month: m.month,
-      income: Number(m.income),
-      expenses: Number(m.expenses)
-    })),
+  const chartData = useMemo(() => {
+    if (!charts) {
+      return {
+        monthly: [],
+        categories: [],
+        balance: [],
+        incomeSources: [],
+        recent: []
+      };
+    }
 
-    categories: charts.categories.map(c => ({
-      name: c.name || "Sem categoria",
-      value: Number(c.value)
-    })),
+    return {
+      monthly: charts.monthly.map(m => ({
+        month: m.month,
+        income: Number(m.income),
+        expenses: Number(m.expenses)
+      })),
 
-    balance: charts.balance.map(b => ({
-      month: b.month,
-      balance: Number(b.balance)
-    })),
+      categories: charts.categories.map(c => ({
+        name: c.name || "Sem categoria",
+        value: Number(c.value)
+      })),
 
-    incomeSources: charts.incomeSources.map(i => ({
-      name: i.name,
-      value: Number(i.value),
-      percent: i.percent
-    })),
+      balance: charts.balance.map(b => ({
+        month: b.month,
+        balance: Number(b.balance)
+      })),
 
-    recent: charts.recent.map(t => ({
-      id: t.id,
-      description: t.description,
-      date: formatPtDate(t.date),
-      category: t?.category_detail?.name,
-      amount: t.amount,
-      type: t.type
-    }))
-  }), [charts]);
+      incomeSources: charts.incomeSources.map(i => ({
+        name: i.name,
+        value: Number(i.value),
+        percent: i.percent
+      })),
+
+      recent: charts.recent.map(t => ({
+        id: t.id,
+        description: t.description,
+        date: formatPtDate(t.date),
+        category: t?.category_detail?.name,
+        amount: t.amount,
+        type: t.type
+      }))
+    };
+  }, [charts]);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in pb-6">
       <TitlePage
         title="Dashboard"
         subtitle="Visão geral das suas finanças pessoais"
       />
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <StatsCard
           title="Saldo Atual"
           value={formattedStats?.balance}
-          description={formattedStats ? `Atualizado em ${formattedStats.asOf}` : <SpinnerInline />}
+          description={
+            formattedStats ? (
+              `Atualizado em ${formattedStats.asOf}`
+            ) : (
+              <SpinnerInline />
+            )
+          }
           icon={<Wallet />}
         />
         <StatsCard
@@ -111,7 +128,7 @@ export default function DashboardPage() {
         />
       </div>
       <div className="grid gap-4 md:grid-cols-12">
-        <div className="md:col-span-7 space-y-4">
+        <div className="space-y-4 md:col-span-7">
           <ChartCard
             type="area"
             data={chartData.monthly}
@@ -119,7 +136,7 @@ export default function DashboardPage() {
             description="Comparativo de receitas e despesas dos últimos 6 meses"
             icon={<BarChart3 />}
             loading={loading.charts}
-            className="h-[320px]"
+            className="h-[260px] sm:h-[320px]"
           />
           <ChartCard
             type="line"
@@ -128,7 +145,7 @@ export default function DashboardPage() {
             description="Crescimento do saldo nos últimos 6 meses"
             icon={<LineChartIcon />}
             loading={loading.charts}
-            className="h-[320px]"
+            className="h-[260px] sm:h-[320px]"
           />
         </div>
         <div className="md:col-span-5">
@@ -142,25 +159,40 @@ export default function DashboardPage() {
                 Últimas 10 movimentações financeiras
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2 max-h-[890px] overflow-auto">
+            <CardContent className="space-y-2 max-h-[360px] sm:max-h-[480px] lg:max-h-[890px] overflow-auto">
               {loading.charts ? (
                 <LoadingOverlay />
               ) : chartData.recent.length > 0 ? (
                 chartData.recent.map(transaction => (
-                  <div key={transaction.id} className="flex items-center justify-between rounded-lg border p-3">
-                    <div>
-                      <div className={`${transaction.description ? "font-semibold" : "text-gray-400"}`}>
+                  <div
+                    key={transaction.id}
+                    className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="space-y-1">
+                      <div
+                        className={
+                          transaction.description
+                            ? "font-semibold"
+                            : "text-gray-400"
+                        }
+                      >
                         {transaction.description || "Não preenchido"}
                       </div>
-                      <div className="text-sm text-muted-foreground flex gap-2">
+                      <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center gap-2">
                         <span>{transaction.date}</span>
                         <span>•</span>
-                        <Badge tone={`${transaction.category ? "neutral" : "default"}`}>
+                        <Badge tone={transaction.category ? "neutral" : "default"}>
                           {transaction.category || "Não preenchido"}
                         </Badge>
                       </div>
                     </div>
-                    <div className={transaction.type === "income" ? "text-green-600" : "text-red-600"}>
+                    <div
+                      className={`text-sm sm:text-base font-semibold ${
+                        transaction.type === "income"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
                       {transaction.type === "income" ? "+ " : "- "}
                       {formatBRL(transaction.amount)}
                     </div>

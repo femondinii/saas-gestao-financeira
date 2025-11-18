@@ -24,11 +24,14 @@ export function Sidebar({ className = "" }) {
         { name: "Planejamento IA", icon: Sparkles, path: "/ai-planning" }
     ];
 
-    const base = "flex h-screen flex-col border-r bg-white dark:bg-neutral-950 text-gray-800 dark:text-gray-100 transition-all duration-300";
+    const base =
+        "fixed left-0 top-0 z-40 flex h-screen flex-col border-r bg-white " +
+        "dark:bg-neutral-950 text-gray-800 dark:text-gray-100 transition-all duration-300";
     const width = collapsed ? "w-[70px]" : "w-[250px]";
     const itemBase = "flex items-center gap-3 rounded-md px-3 py-2 transition-colors";
     const itemActive = "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300";
-    const itemIdle = "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-900/60";
+    const itemIdle =
+        "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-900/60";
 
     async function handleLogout() {
         try {

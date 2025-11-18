@@ -59,6 +59,7 @@ jobs:
           cd backend
           coverage run manage.py test
           coverage xml -o coverage.xml
+          ls -la
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2

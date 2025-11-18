@@ -32,6 +32,7 @@ jobs:
         run: |
           cd frontend
           npm test -- --watchAll=false --passWithNoTests --coverage
+          ls frontend/coverage/lcov.info
 
       - name: Build
         run: |

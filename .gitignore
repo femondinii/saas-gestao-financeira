@@ -13,8 +13,7 @@ __pycache__/
 coverage.xml
 frontend/coverage/
 
-# Virtual env
-venv/
+# env
 .env
 
 # =================

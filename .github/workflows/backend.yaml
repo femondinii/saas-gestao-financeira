@@ -47,24 +47,13 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r backend/requirements.txt
-          pip install coverage
 
       - name: Run migrations
         run: |
           cd backend
           python manage.py migrate
 
-      - name: Run tests with coverage
+      - name: Run tests
         run: |
           cd backend
-          coverage run manage.py test
-          coverage xml -o coverage.xml
-          ls -la
-
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v5.0.0
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          projectBaseDir: .
+          python manage.py test

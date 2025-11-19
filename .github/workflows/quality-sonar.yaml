@@ -1,0 +1,82 @@
+name: Quality & Sonar
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'sonar-project.properties'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  quality-and-sonar:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: financedb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 111111
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm install
+
+      - name: Run frontend tests with coverage
+        working-directory: frontend
+        run: |
+          npm test -- --watchAll=false --passWithNoTests --coverage
+          ls -la coverage  # só pra debug
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install backend deps
+        run: |
+          pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install coverage
+
+      - name: Run migrations
+        working-directory: backend
+        run: python manage.py migrate
+
+      - name: Run backend tests with coverage
+        working-directory: backend
+        run: |
+          coverage run manage.py test
+          coverage xml -o coverage.xml
+          ls -la  # debug
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v5.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectBaseDir: .

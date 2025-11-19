@@ -33,18 +33,13 @@ jobs:
           cd frontend
           npm test -- --watchAll=false --passWithNoTests --coverage
 
-      - name: Debug frontend coverage
-        run: |
-          cd frontend
-          ls -la coverage
-
       - name: Build
         run: |
           cd frontend
           npm run build
 
       - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@4b4d7634dab97dcee0b75763a54a6dc92a9e6bc1
+        uses: sonarsource/sonarcloud-github-action@v5.0.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

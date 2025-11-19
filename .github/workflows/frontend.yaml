@@ -32,7 +32,11 @@ jobs:
         run: |
           cd frontend
           npm test -- --watchAll=false --passWithNoTests --coverage
-          ls -la
+
+      - name: Debug frontend coverage
+        run: |
+          cd frontend
+          ls -la coverage
 
       - name: Build
         run: |

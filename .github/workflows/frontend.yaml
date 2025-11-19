@@ -28,12 +28,20 @@ jobs:
           cd frontend
           npm install
 
-      - name: Run tests
+      - name: Run tests with coverage
         run: |
           cd frontend
-          npm test -- --watchAll=false --passWithNoTests
+          npm test -- --watchAll=false --passWithNoTests --coverage
 
       - name: Build
         run: |
           cd frontend
           npm run build
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v5.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectBaseDir: .

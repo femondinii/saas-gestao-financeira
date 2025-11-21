@@ -20,6 +20,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no femondini20@34.58.172.218 << 'EOF'
             cd /opt/app/saas-gestao-financeira
             git pull origin main
-            docker compose pull
-            docker compose up -d --build
+            docker compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml up -d --build
           EOF

@@ -1,20 +1,10 @@
 function getApiBase() {
-	if (
-		typeof window !== "undefined" &&
-		(window.location.hostname === "localhost" ||
-		window.location.hostname === "127.0.0.1")
-	) {
+	if (typeof window !== "undefined" &&
+		(window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")) {
 		return "http://localhost:8000/api";
 	}
 
-	if (typeof window !== "undefined") {
-		const url = new URL(window.location.origin);
-		url.port = "8000";
-		url.pathname = "/api";
-		return url.toString().replace(/\/$/, "");
-	}
-
-	return "http://localhost:8000/api";
+	return "http://bluefinance.cloud:8000/api";
 }
 
 const API_BASE = getApiBase();

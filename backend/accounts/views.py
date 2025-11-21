@@ -123,10 +123,14 @@ class LogoutView(APIView):
         response.delete_cookie("refresh_token", path="/")
         return response
 
-
-class MeView(generics.RetrieveAPIView):
+class MeView(generics.RetrieveDestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         return self.request.user
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        response.delete_cookie("refresh_token", path="/")
+        return response

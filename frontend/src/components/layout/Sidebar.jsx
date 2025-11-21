@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { api } from "../../lib/api";
 
-export function Sidebar({ className = "" }) {
+export function Sidebar() {
     const [collapsed, setCollapsed] = useState(true);
     const navigate = useNavigate();
 
@@ -43,7 +43,7 @@ export function Sidebar({ className = "" }) {
     }
 
     return (
-        <aside className={`${base} ${width} ${className}`}>
+        <aside className={`${base} ${width} shadow-md`}>
             <div className="flex h-16 items-center justify-between border-b px-3">
                 {!collapsed && (
                     <Link to="/" className="flex items-center gap-2">

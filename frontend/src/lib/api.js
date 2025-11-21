@@ -1,6 +1,20 @@
 function getApiBase() {
-	const base = "http://localhost:8000/api";
-	return base.replace(/\/$/, "");
+	if (
+		typeof window !== "undefined" &&
+		(window.location.hostname === "localhost" ||
+		window.location.hostname === "127.0.0.1")
+	) {
+		return "http://localhost:8000/api";
+	}
+
+	if (typeof window !== "undefined") {
+		const url = new URL(window.location.origin);
+		url.port = "8000";
+		url.pathname = "/api";
+		return url.toString().replace(/\/$/, "");
+	}
+
+	return "http://localhost:8000/api";
 }
 
 const API_BASE = getApiBase();
@@ -35,7 +49,10 @@ async function getNewAccessLocked() {
 	return refreshPromise;
 }
 
-export async function apiFetch(path, { method = "GET", body, headers = {}, withAuth = true } = {}) {
+export async function apiFetch(
+	path,
+	{ method = "GET", body, headers = {}, withAuth = true } = {}
+) {
 	const h = { Accept: "application/json", ...headers };
 	const isJsonBody = body && !(body instanceof FormData) && !h["Content-Type"];
 

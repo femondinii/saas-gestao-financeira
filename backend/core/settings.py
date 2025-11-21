@@ -9,8 +9,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-secret")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
+FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "http://localhost:3000")
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'django-app', 'backend']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'django-app',
+    'backend',
+    '34.58.172.218',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -103,7 +110,7 @@ SIMPLE_JWT = {
 
 GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID', '')
 GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_OAUTH_CLIENT_SECRET', '')
-GOOGLE_OAUTH_REDIRECT_URI = 'http://localhost:3000/auth/callback'
+GOOGLE_OAUTH_REDIRECT_URI = f"{FRONTEND_ORIGIN}/auth/callback"
 
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'UTC'
@@ -121,7 +128,7 @@ PASSWORD_HASHERS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    FRONTEND_ORIGIN,
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -129,7 +136,7 @@ SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
+    FRONTEND_ORIGIN,
 ]
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")

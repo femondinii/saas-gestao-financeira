@@ -55,7 +55,7 @@ export async function apiFetch(
 		h["Content-Type"] = "application/json";
 	}
 
-	const authPath = path.startsWith("/accounts/auth/");
+	const authPath = path.includes("/accounts/auth/");
 
 	if (withAuth) {
 		const access = localStorage.getItem("access_token");

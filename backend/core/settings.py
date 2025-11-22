@@ -17,7 +17,8 @@ ALLOWED_HOSTS = [
     'django-app',
     'backend',
     '34.58.172.218',
-    'bluefinance.cloud'
+    'bluefinance.cloud',
+    'www.bluefinance.cloud',
 ]
 
 INSTALLED_APPS = [
@@ -131,9 +132,19 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
 ]
 
+COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "False") == "True"
+
+SESSION_COOKIE_SECURE = COOKIE_SECURE
+CSRF_COOKIE_SECURE = COOKIE_SECURE
+
+if COOKIE_SECURE:
+    SESSION_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SAMESITE = "None"
+else:
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
+
 CORS_ALLOW_CREDENTIALS = True
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
 
 LOCAL_FRONTENDS = [
     "http://localhost:3000",
@@ -142,7 +153,6 @@ LOCAL_FRONTENDS = [
 
 CORS_ALLOWED_ORIGINS = [FRONTEND_ORIGIN, *LOCAL_FRONTENDS]
 CSRF_TRUSTED_ORIGINS = [FRONTEND_ORIGIN, *LOCAL_FRONTENDS]
-
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")

@@ -17,6 +17,7 @@ ALLOWED_HOSTS = [
     'django-app',
     'backend',
     '34.58.172.218',
+    'bluefinance.cloud'
 ]
 
 INSTALLED_APPS = [
